@@ -40,7 +40,7 @@ object ComponentsRepo {
         if (!exactPresents(component)) addComponent(component) else false
 
     private suspend fun exactPresents(component: Component): Boolean = dbQuery { !Components.select(
-        (id eq component.id!!) and
+        (if (component.id != null) id eq component.id else Op.TRUE) and
         (title eq component.title) and
         (type eq component.type) and
         (description eq component.description) and
