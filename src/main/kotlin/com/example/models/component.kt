@@ -9,7 +9,10 @@ data class Component(
     val description: String,
     val cost: Int,
     val image: String
-)
+) {
+    constructor(title: String, type: Type, description: String, cost: Int, image: String)
+    : this(null, title, type, description, cost, image)
+}
 
 const val ID = "id"
 const val TITLE = "title"

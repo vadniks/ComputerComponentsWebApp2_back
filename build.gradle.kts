@@ -8,7 +8,8 @@ val exposed_version: String by project
 plugins {
     application
     kotlin("jvm") version "1.7.20"
-    id("io.ktor.plugin") version "2.1.2"
+    id("io.ktor.plugin") version "2.1.3"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20"
 }
 
 group = "com.example"
@@ -20,9 +21,7 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
@@ -31,6 +30,7 @@ dependencies {
     implementation("io.ktor:ktor-server-host-common-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-cors-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
