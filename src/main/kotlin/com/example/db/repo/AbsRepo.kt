@@ -41,9 +41,9 @@ abstract class AbsRepo<E, T: Table>(protected val table: T, protected val idColu
 
     suspend fun delete(id: Int): Boolean = dbQuery { table.deleteWhere { idColumn eq id } == 1 }
 
-    init { addTests() }
+    init { addTests(*this.testEntities()) }
 
     @TestOnly fun addTests(vararg entities: E) = runBlocking { entities.forEach { addIfNotExists(it) } }
 
-    @TestOnly abstract fun testEntities(): List<E>
+    @TestOnly abstract fun testEntities(): Array<E>
 }

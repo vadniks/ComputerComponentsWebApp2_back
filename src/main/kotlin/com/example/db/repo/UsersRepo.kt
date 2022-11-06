@@ -54,7 +54,7 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
     ).empty() }
 
     @TestOnly
-    override fun testEntities(): List<User> = listOf(
+    override fun testEntities(): Array<User> = arrayOf(
         User("admin", Role.ADMIN, "admin"),
         User("user", Role.USER, "user")
     )

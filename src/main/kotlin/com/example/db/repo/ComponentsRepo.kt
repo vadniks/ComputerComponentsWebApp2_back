@@ -44,7 +44,7 @@ object ComponentsRepo : AbsRepo<Component, Components>(Components, id) {
     suspend fun getBy(title: String): Component? = getBy(Components.title eq title)
 
     @TestOnly
-    override fun testEntities(): List<Component> = listOf(
+    override fun testEntities(): Array<Component> = arrayOf(
         Component("test", Type.CPU, "test+", 100, null)
     )
 }
