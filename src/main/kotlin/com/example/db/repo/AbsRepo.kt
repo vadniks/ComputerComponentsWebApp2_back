@@ -1,4 +1,4 @@
-package com.example.db
+package com.example.db.repo
 
 import com.example.db.DatabaseFactory.dbQuery
 import kotlinx.coroutines.runBlocking

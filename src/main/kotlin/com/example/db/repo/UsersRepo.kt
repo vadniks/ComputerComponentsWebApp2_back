@@ -1,4 +1,4 @@
-package com.example.db
+package com.example.db.repo
 
 import com.example.db.DatabaseFactory.dbQuery
 import com.example.db.models.Role
@@ -13,20 +13,17 @@ import com.example.db.models.Users.password
 import com.example.db.models.Users.phone
 import com.example.db.models.Users.role
 import com.example.db.models.Users.selection
+import com.example.db.models.Users.token
 import org.jetbrains.annotations.TestOnly
-import org.jetbrains.exposed.sql.Op
-import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 
 object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
 
     override fun resultRowToEntity(row: ResultRow): User = User(
-        row[id],       row[name],      row[role],
-        row[password], row[firstName], row[lastName],
-        row[phone],    row[address],   row[selection]
+        row[id],        row[name],     row[role],  row[password], row[token],
+        row[firstName], row[lastName], row[phone], row[address],  row[selection]
     )
 
     @Suppress("DuplicatedCode")
@@ -35,6 +32,7 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
         it[name] = entity.name
         it[role] = entity.role
         it[password] = entity.password
+        it[token] = entity.token
         it[firstName] = entity.firstName
         it[lastName] = entity.lastName
         it[phone] = entity.phone
@@ -47,6 +45,7 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
         (name eq entity.name) and
         (role eq entity.role) and
         (password eq entity.password) and
+        (token eq entity.token) and
         (firstName eq entity.firstName) and
         (lastName eq entity.lastName) and
         (phone eq entity.phone) and
@@ -59,4 +58,13 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
         User("admin", Role.ADMIN, "admin"),
         User("user", Role.USER, "user")
     )
+
+    suspend fun checkRole(token: String, role: Role): Boolean =
+        getBy(Users.token eq Users.token)?.role == role
+
+    suspend fun checkCredentials(name: String, password: String): Int? =
+        getBy((Users.name eq name) and (Users.password eq password))?.id
+
+    suspend fun setToken(id: Int, token: String): Boolean
+    = dbQuery { Users.update({ Users.id eq id }) { it[Users.token] = token } == 1 }
 }

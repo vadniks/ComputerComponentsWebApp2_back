@@ -1,6 +1,6 @@
 package com.example.plugins
 
-import com.example.db.ComponentsRepo
+import com.example.db.repo.ComponentsRepo
 import com.example.db.models.ID
 import io.ktor.server.routing.*
 import io.ktor.server.http.content.*
