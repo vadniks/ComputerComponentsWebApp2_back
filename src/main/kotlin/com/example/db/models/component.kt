@@ -1,4 +1,4 @@
-package com.example.models
+package com.example.db.models
 
 import org.jetbrains.exposed.sql.Table
 import kotlinx.serialization.Serializable
@@ -13,7 +13,7 @@ data class Component(
     val type: Type,
     val description: String,
     val cost: Int,
-    val image: String
+    val image: String?
 ) {
     constructor(title: String, type: Type, description: String, cost: Int, image: String)
     : this(null, title, type, description, cost, image)
@@ -48,15 +48,15 @@ const val TYPE_AMOUNT = 9
 
 object Components : Table() {
     val id = integer(ID).autoIncrement()
-    val title = varchar(TITLE, TITLE_LENGTH).index()
+    val title = varchar(TITLE, LENGTH_MIDDLE).index()
     val type = enumeration<Type>(TYPE)
-    val description = varchar(DESCRIPTION, DESCRIPTION_LENGTH)
+    val description = varchar(DESCRIPTION, LENGTH_LONG)
     val cost = integer(COST).index()
-    val image = varchar(IMAGE, IMAGE_LENGTH).index()
+    val image = varchar(IMAGE, LENGTH_SHORT).index().nullable()
 
     override val primaryKey = PrimaryKey(id)
 }
 
-const val TITLE_LENGTH = 128
-const val DESCRIPTION_LENGTH = 512
-const val IMAGE_LENGTH = 64
+const val LENGTH_SHORT = 64
+const val LENGTH_MIDDLE = 128
+const val LENGTH_LONG = 512

@@ -1,6 +1,7 @@
 package com.example.db
 
-import com.example.models.Components
+import com.example.db.models.Components
+import com.example.db.models.Users
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -13,7 +14,7 @@ object DatabaseFactory {
         "org.postgresql.Driver",
         "postgres",
         "postgres"
-    )) { SchemaUtils.create(Components) } }
+    )) { SchemaUtils.create(Components, Users) } }
 
     suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction { block() }
 }

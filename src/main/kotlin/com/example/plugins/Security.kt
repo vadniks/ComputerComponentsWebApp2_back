@@ -10,6 +10,10 @@ import io.ktor.server.routing.*
 
 fun Application.configureSecurity() {
 
+}
+
+fun Application.OldconfigureSecurity() {
+
     authentication {
         val myRealm = "MyRealm"
         val usersInMyRealmToHA1: Map<String, ByteArray> = mapOf(
