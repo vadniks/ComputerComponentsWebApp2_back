@@ -15,8 +15,12 @@ fun Application.configureRouting() {
     fun PipelineContext<Unit, ApplicationCall>.getId() = call.parameters.getOrFail<Int>(ID).toInt()
 
     /*
-    * curl 0.0.0.0:8080/component -X POST --header "Content-Type: application/json" --data '{"id":2,"title":"a","type":"MB","description":"b","cost":200,"image":"null"}'
-    **/
+     * curl 0.0.0.0:8080/component
+     * curl 0.0.0.0:8080/component/1
+     * curl 0.0.0.0:8080/component -X POST --header "Content-Type: application/json" --data '{"id":2,"title":"a","type":"MB","description":"b","cost":200,"image":null}'
+     * curl 0.0.0.0:8080/component/1 -X PUT --header "Content-Type: application/json" --data '{"id":2,"title":"a","type":"MB","description":"b","cost":200,"image":null}'
+     * curl 0.0.0.0:8080/component/2 -X DELETE
+     **/
     routing {
         route("/component") {
             post { ComponentsRepo.addIfNotExists(call.receive()) }

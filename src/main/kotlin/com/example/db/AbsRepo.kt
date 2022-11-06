@@ -4,7 +4,7 @@ import com.example.db.DatabaseFactory.dbQuery
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
-import org.jetbrains.exposed.sql.statements.UpdateStatement
+import org.jetbrains.exposed.sql.statements.UpdateBuilder
 
 abstract class AbsRepo<E, T: Table>(protected val table: T, protected val idColumn: Column<Int>) {
 
@@ -18,10 +18,10 @@ abstract class AbsRepo<E, T: Table>(protected val table: T, protected val idColu
 
     private fun InsertStatement<Number>.oneRowAffected(): Boolean = insertedCount == 1
 
-    protected suspend fun performAdd(body: T.(InsertStatement<Number>) -> Unit): Boolean
-    = dbQuery { table.insert(body).oneRowAffected() }
+    protected abstract fun setValues(it: UpdateBuilder<Int>, entity: E)
 
-    protected abstract suspend fun add(entity: E): Boolean
+    private suspend fun add(entity: E): Boolean
+    = dbQuery { table.insert { setValues(it, entity) }.oneRowAffected() }
 
     protected abstract suspend fun exactPresents(entity: E): Boolean
 
@@ -34,10 +34,8 @@ abstract class AbsRepo<E, T: Table>(protected val table: T, protected val idColu
 
     suspend fun getBy(id: Int): E? = getBy(idColumn eq id)
 
-    protected suspend fun performUpdate(id: Int, body: T.(UpdateStatement) -> Unit): Boolean
-    = dbQuery { table.update({ idColumn eq id }, body = body) == 1 }
-
-    abstract suspend fun update(id: Int, entity: E): Boolean
+    suspend fun update(id: Int, entity: E): Boolean
+    = dbQuery { table.update({ idColumn eq id }) { setValues(it, entity) } == 1 }
 
     suspend fun delete(id: Int): Boolean = dbQuery { table.deleteWhere { idColumn eq id } == 1 }
 }

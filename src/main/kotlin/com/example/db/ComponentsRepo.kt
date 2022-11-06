@@ -13,6 +13,7 @@ import com.example.db.models.Type
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.statements.UpdateBuilder
 
 object ComponentsRepo : AbsRepo<Component, Components>(Components, id) {
 
@@ -21,7 +22,8 @@ object ComponentsRepo : AbsRepo<Component, Components>(Components, id) {
 
     suspend fun getAll(type: Type): List<Component> = getAllBy(Components.type eq type)
 
-    override suspend fun add(entity: Component): Boolean = performAdd {
+    @Suppress("DuplicatedCode")
+    override fun setValues(it: UpdateBuilder<Int>, entity: Component) {
         if (entity.id != null) it[id] = entity.id
         it[title] = entity.title
         it[type] = entity.type
@@ -40,15 +42,6 @@ object ComponentsRepo : AbsRepo<Component, Components>(Components, id) {
     ).empty() }
 
     suspend fun getBy(title: String): Component? = getBy(Components.title eq title)
-
-    override suspend fun update(id: Int, entity: Component): Boolean
-    = performUpdate(id) {
-        it[title] = entity.title
-        it[type] = entity.type
-        it[description] = entity.description
-        it[cost] = entity.cost
-        it[image] = entity.image
-    }
 
     init { runBlocking {
         addIfNotExists(Component("test", Type.CPU, "test+", 100, null))
