@@ -12,7 +12,13 @@ data class User(
     val phone: Int?,
     val address: String?,
     val selection: String?
-)
+) {
+    constructor(name: String, role: Role, password: String) : this(
+        null,
+        name, role, password,
+        null, null, null, null, null
+    )
+}
 
 const val NAME = "name"
 const val ROLE = "role"

@@ -1,6 +1,8 @@
 package com.example.db
 
 import com.example.db.DatabaseFactory.dbQuery
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.annotations.TestOnly
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
@@ -38,4 +40,10 @@ abstract class AbsRepo<E, T: Table>(protected val table: T, protected val idColu
     = dbQuery { table.update({ idColumn eq id }) { setValues(it, entity) } == 1 }
 
     suspend fun delete(id: Int): Boolean = dbQuery { table.deleteWhere { idColumn eq id } == 1 }
+
+    init { addTests() }
+
+    @TestOnly fun addTests(vararg entities: E) = runBlocking { entities.forEach { addIfNotExists(it) } }
+
+    @TestOnly abstract fun testEntities(): List<E>
 }

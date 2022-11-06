@@ -1,6 +1,7 @@
 package com.example.db
 
 import com.example.db.DatabaseFactory.dbQuery
+import com.example.db.models.Role
 import com.example.db.models.User
 import com.example.db.models.Users
 import com.example.db.models.Users.address
@@ -12,6 +13,7 @@ import com.example.db.models.Users.password
 import com.example.db.models.Users.phone
 import com.example.db.models.Users.role
 import com.example.db.models.Users.selection
+import org.jetbrains.annotations.TestOnly
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -51,4 +53,10 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
         (address eq entity.address) and
         (selection eq entity.selection)
     ).empty() }
+
+    @TestOnly
+    override fun testEntities(): List<User> = listOf(
+        User("admin", Role.ADMIN, "admin"),
+        User("user", Role.USER, "user")
+    )
 }

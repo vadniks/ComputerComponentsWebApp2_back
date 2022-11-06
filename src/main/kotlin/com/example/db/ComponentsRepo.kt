@@ -10,7 +10,7 @@ import com.example.db.models.Components.image
 import com.example.db.models.Components.title
 import com.example.db.models.Components.type
 import com.example.db.models.Type
-import kotlinx.coroutines.runBlocking
+import org.jetbrains.annotations.TestOnly
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
@@ -43,7 +43,8 @@ object ComponentsRepo : AbsRepo<Component, Components>(Components, id) {
 
     suspend fun getBy(title: String): Component? = getBy(Components.title eq title)
 
-    init { runBlocking {
-        addIfNotExists(Component("test", Type.CPU, "test+", 100, null))
-    } }
+    @TestOnly
+    override fun testEntities(): List<Component> = listOf(
+        Component("test", Type.CPU, "test+", 100, null)
+    )
 }
