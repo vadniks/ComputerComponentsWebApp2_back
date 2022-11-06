@@ -21,7 +21,9 @@ data class Component(
 
 fun Component.toJson() = Json.encodeToString(this)
 
-fun String.jsonToComponent() = Json.decodeFromString<Component>(this)
+fun String.toComponent() = Json.decodeFromString<Component>(this)
+
+fun List<Component>.toJson() = Json.encodeToString(this)
 
 const val ID = "id"
 const val TITLE = "title"

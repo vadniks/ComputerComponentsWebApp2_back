@@ -57,8 +57,8 @@ object ComponentsRepo {
 
     suspend fun getComponent(title: String) = getComponent(Components.title eq title)
 
-    suspend fun updateComponent(component: Component): Boolean
-    = dbQuery { Components.update({ id eq component.id!! }) {
+    suspend fun updateComponent(id: Int, component: Component): Boolean
+    = dbQuery { Components.update({ Components.id eq id }) {
         it[title] = component.title
         it[type] = component.type
         it[description] = component.description
