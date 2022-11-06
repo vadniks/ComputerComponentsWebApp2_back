@@ -15,7 +15,7 @@ data class Component(
     val cost: Int,
     val image: String?
 ) {
-    constructor(title: String, type: Type, description: String, cost: Int, image: String)
+    constructor(title: String, type: Type, description: String, cost: Int, image: String?)
     : this(null, title, type, description, cost, image)
 }
 

@@ -51,6 +51,6 @@ object ComponentsRepo : AbsRepo<Component, Components>(Components, id) {
     }
 
     init { runBlocking {
-        addIfNotExists(Component("test", Type.CPU, "test+", 100, "null"))
+        addIfNotExists(Component("test", Type.CPU, "test+", 100, null))
     } }
 }
