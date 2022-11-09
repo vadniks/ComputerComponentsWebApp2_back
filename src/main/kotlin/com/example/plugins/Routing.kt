@@ -32,7 +32,7 @@ fun Application.configureRouting() {
             authAdmin { post { ComponentsRepo.addIfNotExists(call.receive()) } }
             get { call.respond(ComponentsRepo.getAll()) }
             route("/{id}") {
-                authAdmin { get { call.respondNullable(ComponentsRepo.getBy(getId())) } }
+                get { call.respondNullable(ComponentsRepo.getBy(getId())) }
                 authAdmin { put { ComponentsRepo.update(getId(), call.receive()) } }
                 authAdmin { delete { ComponentsRepo.delete(getId()) } }
             }
