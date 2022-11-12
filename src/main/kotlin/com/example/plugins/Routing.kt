@@ -1,6 +1,5 @@
 package com.example.plugins
 
-import com.example.db.repo.ComponentsRepo
 import com.example.db.models.ID
 import com.example.service.ComponentService
 import com.example.service.UserService
@@ -10,13 +9,27 @@ import io.ktor.server.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
-import io.ktor.server.request.*
 import io.ktor.server.sessions.*
 import io.ktor.server.util.*
 
-fun getId(call: ApplicationCall) = call.parameters.getOrFail<Int>(ID).toInt()
-suspend fun respondOk(call: ApplicationCall) = call.respond(HttpStatusCode.OK)
-fun Route.authAdmin(build: Route.() -> Unit) = authenticate(SESSION_ADMIN, build = build)
+fun ApplicationCall.getIdParameter() = parameters.getOrFail<Int>(ID).toInt()
+suspend fun ApplicationCall.respondOk() = respond(HttpStatusCode.OK)
+suspend fun ApplicationCall.respondUserError() = respond(HttpStatusCode.BadRequest)
+private fun Route.authAdmin(build: Route.() -> Unit) = authenticate(SESSION_ADMIN, build = build)
+private fun Route.authUser(build: Route.() -> Unit) = authenticate(SESSION_USER, build = build)
+
+suspend fun ApplicationCall.doIfTokenIsNotNull(
+    onNull: (suspend () -> Unit)? = null, action: suspend (String) -> Unit
+) {
+    val token = sessions.get<UserTokenPrincipal>()?.token
+    if (token != null) action(token) else if (onNull != null) onNull() else respondUserError()
+}
+
+suspend inline fun <reified T>
+ApplicationCall.respondIfTokenIsNotNull(crossinline responseMaker: suspend (String) -> T) {
+    val token = sessions.get<UserTokenPrincipal>()?.token
+    respondNullable(if (token != null) responseMaker(token) else null)
+}
 
 /**
  * curl 0.0.0.0:8080/component
@@ -29,12 +42,13 @@ fun Route.authAdmin(build: Route.() -> Unit) = authenticate(SESSION_ADMIN, build
 fun Application.configureRouting() = routing {
     componentRouting()
     userRouting()
+    staticRouting()
+}
 
-    static {
-        resource("/", "/static/index.html")
-        static("/") {
-            resources("static")
-        }
+private fun Routing.staticRouting() = static {
+    resource("/", "/static/index.html")
+    static("/") {
+        resources("static")
     }
 }
 
@@ -46,13 +60,11 @@ private fun Routing.componentRouting() = route("/component") {
         authAdmin { put { ComponentService.update(call) } }
         authAdmin { delete { ComponentService.delete(call) } }
     }
-
-    post("/select/{id}") {
-
-    }
 }
 
 private fun Routing.userRouting() {
     authenticate(FORM) { post("/login") { UserService.login(call) } }
     authenticate(SESSION_USER, SESSION_ADMIN) { post("/logout") { UserService.logout(call) } }
+    authUser { post("/select/{id}") { UserService.select(call) } }
+    authUser { get("/selected") { UserService.selected(call) } }
 }

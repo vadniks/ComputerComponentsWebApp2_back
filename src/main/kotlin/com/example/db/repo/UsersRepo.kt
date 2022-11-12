@@ -66,10 +66,14 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
         getBy((Users.name eq name) and (Users.password eq password))?.id
 
     suspend fun setToken(id: Int, token: String): Boolean =
-        updateSingle(Users.id eq Users.id, Users.token, token)
+        updateSingle(Users.id eq id, Users.token, token)
 
-    suspend fun getToken(id: Int): String? = getSingle(Users.id eq Users.id, token)
+    suspend fun getToken(id: Int): String? = getSingle(Users.id eq id, token)
 
-    suspend fun setSelection(id: Int, selection: String): Boolean =
-        updateSingle(Users.id eq Users.id, Users.selection, selection)
+    suspend fun getId(token: String): Int? = getSingle(Users.token eq token, id)
+
+    suspend fun setSelection(token: String, selection: String): Boolean =
+        updateSingle(Users.token eq token, Users.selection, selection)
+
+    suspend fun getSelection(token: String): String? = getSingle(Users.token eq token, selection)
 }
