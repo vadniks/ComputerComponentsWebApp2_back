@@ -60,13 +60,16 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
     )
 
     suspend fun checkRole(token: String, role: Role): Boolean =
-        getBy(Users.token eq Users.token)?.role == role
+        getBy(Users.token eq token)?.role == role
 
     suspend fun checkCredentials(name: String, password: String): Int? =
         getBy((Users.name eq name) and (Users.password eq password))?.id
 
-    suspend fun setToken(id: Int, token: String): Boolean
-    = dbQuery { Users.update({ Users.id eq id }) { it[Users.token] = token } == 1 }
+    suspend fun setToken(id: Int, token: String): Boolean =
+        updateSingle(Users.id eq Users.id, Users.token, token)
 
-//    suspend fun
+    suspend fun getToken(id: Int): String? = getSingle(Users.id eq Users.id, token)
+
+    suspend fun setSelection(id: Int, selection: String): Boolean =
+        updateSingle(Users.id eq Users.id, Users.selection, selection)
 }
