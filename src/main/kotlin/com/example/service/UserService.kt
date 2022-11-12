@@ -26,4 +26,7 @@ object UserService {
     }
 
     suspend fun selected(call: ApplicationCall) = call.respondIfTokenIsNotNull { getSelection(it) }
+
+    suspend fun clearSelected(call: ApplicationCall) =
+        call.doIfTokenIsNotNull { setSelection(it, null) }
 }

@@ -17,12 +17,14 @@ suspend fun ApplicationCall.respondOk() = respond(HttpStatusCode.OK)
 suspend fun ApplicationCall.respondUserError() = respond(HttpStatusCode.BadRequest)
 private fun Route.authAdmin(build: Route.() -> Unit) = authenticate(SESSION_ADMIN, build = build)
 private fun Route.authUser(build: Route.() -> Unit) = authenticate(SESSION_USER, build = build)
+private fun Route.authAny(build: Route.() -> Unit) = authenticate(SESSION_USER, SESSION_ADMIN, build = build)
 
 suspend fun ApplicationCall.doIfTokenIsNotNull(
     onNull: (suspend () -> Unit)? = null, action: suspend (String) -> Unit
 ) {
     val token = sessions.get<UserTokenPrincipal>()?.token
-    if (token != null) action(token) else if (onNull != null) onNull() else respondUserError()
+    if (token != null) { action(token); respondOk() }
+    else if (onNull != null) onNull() else respondUserError()
 }
 
 suspend inline fun <reified T>
@@ -34,10 +36,11 @@ ApplicationCall.respondIfTokenIsNotNull(crossinline responseMaker: suspend (Stri
 /**
  * curl 0.0.0.0:8080/component
  * curl 0.0.0.0:8080/component/1
- * curl 0.0.0.0:8080/component -X POST --header "Content-Type: application/json" --data '{"id":2,"title":"a","type":"MB","description":"b","cost":200,"image":null}'
- * curl 0.0.0.0:8080/component/1 -X PUT --header "Content-Type: application/json" --data '{"id":2,"title":"a","type":"MB","description":"b","cost":200,"image":null}'
- * curl 0.0.0.0:8080/component/2 -X DELETE
- * curl -v 0.0.0.0:8080/login -X POST -F 'name=admin' -F 'password=admin'
+ * curl 0.0.0.0:8080/component -X POST -H "Content-Type: application/json" -d '{"id":2,"title":"a","type":"MB","description":"b","cost":200,"image":null}' -b cookie.txt
+ * curl 0.0.0.0:8080/component/2 -X PUT -H "Content-Type: application/json" -d '{"id":2,"title":"a","type":"MB","description":"b","cost":111,"image":null}' -b cookie.txt
+ * curl 0.0.0.0:8080/component/2 -X DELETE -b cookie.txt
+ * curl 0.0.0.0:8080/login -X POST -F 'name=user' -F 'password=user' -c cookie.txt
+ * curl 0.0.0.0:8080/login -X POST -F 'name=admin' -F 'password=admin' -c cookie.txt
  */
 fun Application.configureRouting() = routing {
     componentRouting()
@@ -64,7 +67,8 @@ private fun Routing.componentRouting() = route("/component") {
 
 private fun Routing.userRouting() {
     authenticate(FORM) { post("/login") { UserService.login(call) } }
-    authenticate(SESSION_USER, SESSION_ADMIN) { post("/logout") { UserService.logout(call) } }
-    authUser { post("/select/{id}") { UserService.select(call) } }
-    authUser { get("/selected") { UserService.selected(call) } }
+    authAny { post("/logout") { UserService.logout(call) } }
+    authAny { post("/select/{id}") { UserService.select(call) } }
+    authAny { get("/selected") { UserService.selected(call) } }
+    authAny { post("/clearSelected") { UserService.clearSelected(call) } }
 }

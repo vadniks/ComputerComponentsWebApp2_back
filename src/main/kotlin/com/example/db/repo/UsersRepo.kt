@@ -72,7 +72,7 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
 
     suspend fun getId(token: String): Int? = getSingle(Users.token eq token, id)
 
-    suspend fun setSelection(token: String, selection: String): Boolean =
+    suspend fun setSelection(token: String, selection: String?): Boolean =
         updateSingle(Users.token eq token, Users.selection, selection)
 
     suspend fun getSelection(token: String): String? = getSingle(Users.token eq token, selection)
