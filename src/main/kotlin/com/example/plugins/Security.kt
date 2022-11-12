@@ -1,15 +1,14 @@
 package com.example.plugins
 
-import ch.qos.logback.classic.Logger
 import com.example.db.models.NAME
 import com.example.db.models.PASSWORD
 import com.example.db.models.Role
+import com.example.db.repo.SessionStorageDatabase
 import com.example.db.repo.UsersRepo
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.sessions.*
 import io.ktor.server.application.*
-import io.ktor.server.engine.*
 import io.ktor.server.response.*
 import io.ktor.util.*
 import java.util.UUID
@@ -54,7 +53,7 @@ fun Application.configureSecurity() {
         }
     }
     install(Sessions) {
-        cookie<UserTokenPrincipal>(COOKIE, SessionStorageMemory()) { // TODO: store session data in database
+        cookie<UserTokenPrincipal>(COOKIE, /*SessionStorageDatabase()*/SessionStorageMemory()) {
             transform(SessionTransportTransformerEncrypt(
                 hex("00112233445566778899aabbccddeeff"),
                 hex("6819b57a326945c1968f45236589"))
