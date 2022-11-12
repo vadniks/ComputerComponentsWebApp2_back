@@ -1,12 +1,8 @@
 package com.example.db.models
 
 import org.jetbrains.exposed.sql.Table
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.decodeFromString
 
-@Serializable
+@kotlinx.serialization.Serializable
 data class Component(
     val id: Int?,
     val title: String,
@@ -18,12 +14,6 @@ data class Component(
     constructor(title: String, type: Type, description: String, cost: Int, image: String?)
     : this(null, title, type, description, cost, image)
 }
-
-fun Component.toJson() = Json.encodeToString(this)
-
-fun String.toComponent() = Json.decodeFromString<Component>(this)
-
-fun List<Component>.toJson() = Json.encodeToString(this)
 
 const val ID = "id"
 const val TITLE = "title"

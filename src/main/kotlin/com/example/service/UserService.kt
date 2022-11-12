@@ -8,6 +8,7 @@ import com.example.db.repo.UsersRepo.setSelection
 import com.example.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.response.*
 import io.ktor.server.sessions.*
 
 object UserService {
@@ -22,26 +23,26 @@ object UserService {
         call.respondOk()
     }
 
-    suspend fun select(call: ApplicationCall) = call.doIfTokenIsNotNull {
+    suspend fun select(call: ApplicationCall) = call.doIfUserIdFound {
         val id = call.getIdParameter()
         if (id == null) {
             call.respondUserError()
-            return@doIfTokenIsNotNull
+            return@doIfUserIdFound
         }
 
         val component = ComponentService.getById(id)
         if (component == null) {
             call.respondUserError()
-            return@doIfTokenIsNotNull
+            return@doIfUserIdFound
         }
 
         setSelection(it, (getSelection(it)?.toSelection() ?: Selection()).apply { this[component.type] = id }.toString())
         call.respondOk()
     }
 
-    suspend fun selected(call: ApplicationCall) = call.respondIfTokenIsNotNull { getSelection(it) }
+    suspend fun selected(call: ApplicationCall) = call.doIfUserIdFound { call.respondNullable(getSelection(it)) }
 
-    suspend fun clearSelected(call: ApplicationCall) = call.doIfTokenIsNotNull {
+    suspend fun clearSelected(call: ApplicationCall) = call.doIfUserIdFound {
         setSelection(it, null)
         call.respondOk()
     }

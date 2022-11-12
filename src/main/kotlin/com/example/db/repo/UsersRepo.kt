@@ -19,7 +19,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 
-object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
+object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
 
     override fun resultRowToEntity(row: ResultRow): User = User(
         row[id],        row[name],     row[role],  row[password], row[token],
@@ -59,21 +59,17 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
         User("user", Role.USER, "user")
     )
 
-    suspend fun checkRole(token: String, role: Role): Boolean =
-        getBy(Users.token eq token)?.role == role
-
-    suspend fun checkCredentials(name: String, password: String): Int? =
-        getBy((Users.name eq name) and (Users.password eq password))?.id
-
-    suspend fun setToken(id: Int, token: String): Boolean =
-        updateSingle(Users.id eq id, Users.token, token)
-
-    suspend fun getToken(id: Int): String? = getSingle(Users.id eq id, token)
-
     suspend fun getId(token: String): Int? = getSingle(Users.token eq token, id)
 
-    suspend fun setSelection(token: String, selection: String?): Boolean =
-        updateSingle(Users.token eq token, Users.selection, selection)
+    suspend fun setToken(id: Int, token: String): Boolean = updateSingle(Users.id eq id, Users.token, token)
 
-    suspend fun getSelection(token: String): String? = getSingle(Users.token eq token, selection)
+    suspend fun checkRole(id: Int, role: Role): Boolean = getSingle(Users.id eq id, Users.role) == role
+
+    suspend fun checkCredentials(name: String, password: String): Int? =
+        getSingle((Users.name eq name) and (Users.password eq password), id)
+
+    suspend fun setSelection(id: Int, selection: String?): Boolean =
+        updateSingle(Users.id eq id, Users.selection, selection)
+
+    suspend fun getSelection(id: Int): String? = getSingle(Users.id eq id, selection)
 }

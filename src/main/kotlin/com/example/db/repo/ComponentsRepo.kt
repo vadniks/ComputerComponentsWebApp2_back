@@ -15,7 +15,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 
-object ComponentsRepo : AbsRepo<Component, Components>(Components, id) {
+object ComponentsRepo : AbsRepo<Component, Components, Int>(Components, id) {
 
     override fun resultRowToEntity(row: ResultRow): Component =
         Component(row[id], row[title], row[type], row[description], row[cost], row[image])

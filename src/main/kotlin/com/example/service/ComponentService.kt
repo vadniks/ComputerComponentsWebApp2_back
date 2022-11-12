@@ -12,13 +12,13 @@ object ComponentService {
 
     suspend fun getAll(call: ApplicationCall) = call.respond(ComponentsRepo.getAll())
 
-    suspend fun getById(call: ApplicationCall) = call.respondIfIdIsNotNull { getById(it) }
+    suspend fun getById(call: ApplicationCall) = call.respondIfIdParameterIsNotNull { getById(it) }
 
     suspend fun getById(id: Int) = ComponentsRepo.getBy(id)
 
     suspend fun update(call: ApplicationCall) =
-        call.doIfIdIsNotNull { call.respondOkITrue(ComponentsRepo.update(it, call.receive())) }
+        call.doIfIdParameterIsNotNull { call.respondOkITrue(ComponentsRepo.update(it, call.receive())) }
 
     suspend fun delete(call: ApplicationCall) =
-        call.doIfIdIsNotNull { call.respondOkITrue(ComponentsRepo.delete(it)) }
+        call.doIfIdParameterIsNotNull { call.respondOkITrue(ComponentsRepo.delete(it)) }
 }

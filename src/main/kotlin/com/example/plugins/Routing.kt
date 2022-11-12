@@ -1,6 +1,7 @@
 package com.example.plugins
 
 import com.example.db.models.ID
+import com.example.db.repo.UsersRepo
 import com.example.service.ComponentService
 import com.example.service.UserService
 import io.ktor.http.*
@@ -15,34 +16,31 @@ fun ApplicationCall.getIdParameter() = parameters[ID]?.toIntOrNull()
 suspend fun ApplicationCall.respondOk() = respond(HttpStatusCode.OK)
 suspend fun ApplicationCall.respondUserError() = respond(HttpStatusCode.BadRequest)
 private fun Route.authAdmin(build: Route.() -> Unit) = authenticate(SESSION_ADMIN, build = build)
-private fun Route.authUser(build: Route.() -> Unit) = authenticate(SESSION_USER, build = build)
+@Deprecated("") private fun Route.authUser(build: Route.() -> Unit) = authenticate(SESSION_USER, build = build)
 private fun Route.authAny(build: Route.() -> Unit) = authenticate(SESSION_USER, SESSION_ADMIN, build = build)
 suspend fun ApplicationCall.respondOkITrue(result: Boolean) = if (result) respondOk() else respondUserError()
 
-suspend fun ApplicationCall.doIfTokenIsNotNull(
-    onNull: (suspend () -> Unit)? = null, action: suspend (String) -> Unit
-) {
+@Deprecated("")
+private suspend inline fun <T> doIfNotNull(nullable: T?, crossinline action: suspend (T) -> Unit) =
+    if (nullable != null) action(nullable) else Unit
+
+suspend inline fun ApplicationCall.doIfUserIdFound(crossinline action: suspend (Int) -> Unit) {
     val token = sessions.get<UserTokenPrincipal>()?.token
-    if (token != null) action(token)
-    else if (onNull != null) onNull() else respondUserError()
+    if (token == null) {
+        respondUserError()
+        return
+    }
+    val id = UsersRepo.getId(token)
+    if (id != null) action(id) else respondUserError()
 }
 
-suspend inline fun <reified T>
-ApplicationCall.respondIfTokenIsNotNull(crossinline responseMaker: suspend (String) -> T) {
-    val token = sessions.get<UserTokenPrincipal>()?.token
-    respondNullable(if (token != null) responseMaker(token) else null)
-}
-
-suspend fun ApplicationCall.doIfIdIsNotNull(
-    onNull: (suspend () -> Unit)? = null, action: suspend (Int) -> Unit
-) {
+suspend inline fun ApplicationCall.doIfIdParameterIsNotNull(crossinline action: suspend (Int) -> Unit) {
     val id = getIdParameter()
     if (id != null) action(id)
-    else if (onNull != null) onNull() else respondUserError()
+    else respondUserError()
 }
 
-suspend inline fun <reified T>
-ApplicationCall.respondIfIdIsNotNull(crossinline responseMaker: suspend (Int) -> T) {
+suspend inline fun <reified T> ApplicationCall.respondIfIdParameterIsNotNull(crossinline responseMaker: suspend (Int) -> T) {
     val id = getIdParameter()
     respondNullable(if (id != null) responseMaker(id) else null)
 }
