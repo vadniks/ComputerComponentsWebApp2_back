@@ -10,20 +10,20 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
-import io.ktor.server.util.*
 
-fun ApplicationCall.getIdParameter() = parameters.getOrFail<Int>(ID).toInt()
+fun ApplicationCall.getIdParameter() = parameters[ID]?.toIntOrNull()
 suspend fun ApplicationCall.respondOk() = respond(HttpStatusCode.OK)
 suspend fun ApplicationCall.respondUserError() = respond(HttpStatusCode.BadRequest)
 private fun Route.authAdmin(build: Route.() -> Unit) = authenticate(SESSION_ADMIN, build = build)
 private fun Route.authUser(build: Route.() -> Unit) = authenticate(SESSION_USER, build = build)
 private fun Route.authAny(build: Route.() -> Unit) = authenticate(SESSION_USER, SESSION_ADMIN, build = build)
+suspend fun ApplicationCall.respondOkITrue(result: Boolean) = if (result) respondOk() else respondUserError()
 
 suspend fun ApplicationCall.doIfTokenIsNotNull(
     onNull: (suspend () -> Unit)? = null, action: suspend (String) -> Unit
 ) {
     val token = sessions.get<UserTokenPrincipal>()?.token
-    if (token != null) { action(token); respondOk() }
+    if (token != null) action(token)
     else if (onNull != null) onNull() else respondUserError()
 }
 
@@ -31,6 +31,20 @@ suspend inline fun <reified T>
 ApplicationCall.respondIfTokenIsNotNull(crossinline responseMaker: suspend (String) -> T) {
     val token = sessions.get<UserTokenPrincipal>()?.token
     respondNullable(if (token != null) responseMaker(token) else null)
+}
+
+suspend fun ApplicationCall.doIfIdIsNotNull(
+    onNull: (suspend () -> Unit)? = null, action: suspend (Int) -> Unit
+) {
+    val id = getIdParameter()
+    if (id != null) action(id)
+    else if (onNull != null) onNull() else respondUserError()
+}
+
+suspend inline fun <reified T>
+ApplicationCall.respondIfIdIsNotNull(crossinline responseMaker: suspend (Int) -> T) {
+    val id = getIdParameter()
+    respondNullable(if (id != null) responseMaker(id) else null)
 }
 
 /**
@@ -41,6 +55,8 @@ ApplicationCall.respondIfTokenIsNotNull(crossinline responseMaker: suspend (Stri
  * curl 0.0.0.0:8080/component/2 -X DELETE -b cookie.txt
  * curl 0.0.0.0:8080/login -X POST -F 'name=user' -F 'password=user' -c cookie.txt
  * curl 0.0.0.0:8080/login -X POST -F 'name=admin' -F 'password=admin' -c cookie.txt
+ * curl 0.0.0.0:8080/selected -b cookie.txt
+ * curl 0.0.0.0:8080/select/1 -X POST -b cookie.txt
  */
 fun Application.configureRouting() = routing {
     componentRouting()

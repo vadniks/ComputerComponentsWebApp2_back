@@ -31,9 +31,7 @@ const val PHONE = "phone"
 const val ADDRESS = "address"
 const val SELECTION = "selection"
 
-enum class Role(val role: Int) {
-    USER(0), ADMIN(1)
-}
+enum class Role(val role: Int) { USER(0), ADMIN(1) }
 
 object Users : Table() {
     val id = integer(ID).autoIncrement()

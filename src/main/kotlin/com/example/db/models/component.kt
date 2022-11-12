@@ -44,6 +44,32 @@ enum class Type(val type: Int, val title: String) {
     CASE(8, "Case")
 }
 
+data class Selection(
+    var cpu: Int? = null, var mb: Int? = null, var gpu: Int? = null,
+    var ram: Int? = null, var hdd: Int? = null, var ssd: Int? = null,
+    var psu: Int? = null, var fan: Int? = null, var case: Int? = null
+) { override fun toString() = "$cpu,$mb,$gpu,$ram,$hdd,$ssd,$psu,$fan,$case" }
+
+fun String.toSelection(): Selection? {
+    val values = split(',')
+    if (values.isEmpty()) return null
+
+    val v = { index: Int -> values[index].toIntOrNull() }
+    return Selection(v(0), v(1), v(2), v(3), v(4), v(5), v(6), v(7), v(8))
+}
+
+infix operator fun Selection.get(type: Type): Int? = when (type) {
+    Type.CPU -> cpu; Type.MB -> mb; Type.GPU -> gpu
+    Type.RAM -> ram; Type.HDD -> hdd; Type.SSD -> ssd
+    Type.PSU -> psu; Type.FAN -> fan; Type.CASE -> case
+}
+
+operator fun Selection.set(type: Type, id: Int) = when (type) {
+    Type.CPU -> cpu = id; Type.MB -> mb = id; Type.GPU -> gpu = id
+    Type.RAM -> ram = id; Type.HDD -> hdd = id; Type.SSD -> ssd = id
+    Type.PSU -> psu = id; Type.FAN -> fan = id; Type.CASE -> case = id
+}
+
 const val TYPE_AMOUNT = 9
 
 object Components : Table() {
