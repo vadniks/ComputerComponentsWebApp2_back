@@ -67,4 +67,6 @@ object UsersRepo : AbsRepo<User, Users>(Users, Users.id) {
 
     suspend fun setToken(id: Int, token: String): Boolean
     = dbQuery { Users.update({ Users.id eq id }) { it[Users.token] = token } == 1 }
+
+//    suspend fun
 }
