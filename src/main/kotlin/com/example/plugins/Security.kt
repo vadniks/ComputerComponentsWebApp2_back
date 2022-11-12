@@ -10,7 +10,6 @@ import io.ktor.util.*
 import io.ktor.server.sessions.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import java.security.MessageDigest
 
 const val SESSION_USER = "session_user"

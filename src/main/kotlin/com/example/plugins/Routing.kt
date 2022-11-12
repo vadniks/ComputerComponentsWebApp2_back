@@ -55,8 +55,10 @@ ApplicationCall.respondIfIdIsNotNull(crossinline responseMaker: suspend (Int) ->
  * curl 0.0.0.0:8080/component/2 -X DELETE -b cookie.txt
  * curl 0.0.0.0:8080/login -X POST -F 'name=user' -F 'password=user' -c cookie.txt
  * curl 0.0.0.0:8080/login -X POST -F 'name=admin' -F 'password=admin' -c cookie.txt
+ * curl 0.0.0.0:8080/logout -X POST -b cookie.txt -c cookie.txt
  * curl 0.0.0.0:8080/selected -b cookie.txt
  * curl 0.0.0.0:8080/select/1 -X POST -b cookie.txt
+ * curl 0.0.0.0:8080/clearSelected -X POST -b cookie.txt
  */
 fun Application.configureRouting() = routing {
     componentRouting()
