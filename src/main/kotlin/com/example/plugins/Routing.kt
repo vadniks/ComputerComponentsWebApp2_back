@@ -15,7 +15,7 @@ fun ApplicationCall.getIdParameter() = parameters[ID]?.toIntOrNull()
 suspend fun ApplicationCall.respondOk() = respond(HttpStatusCode.OK)
 suspend fun ApplicationCall.respondUserError() = respond(HttpStatusCode.BadRequest)
 private fun Route.authAdmin(build: Route.() -> Unit) = authenticate(SESSION_ADMIN, build = build)
-private fun Route.authAny(build: Route.() -> Unit) = authenticate(SESSION_USER, SESSION_ADMIN, build = build)
+private fun Route.authUser(build: Route.() -> Unit) = authenticate(SESSION_USER, build = build)
 suspend fun ApplicationCall.respondOkIfTrue(result: Boolean) = if (result) respondOk() else respondUserError()
 
 suspend inline fun ApplicationCall.doIfUserIdFound(crossinline action: suspend (Int) -> Unit)
@@ -47,6 +47,7 @@ private const val idParam = "/{id}"
  * curl 0.0.0.0:8080/selected -b cookie.txt
  * curl 0.0.0.0:8080/select/1 -X POST -b cookie.txt
  * curl 0.0.0.0:8080/clearSelected -X POST -b cookie.txt
+ * curl 0.0.0.0:8080/order -X POST -H "Content-Type: application/json" -d '{"firstName":"fn","lastName":"ln","phone":1234567890,"address":"address"}' -b cookie.txt
  * curl 0.0.0.0:8080/user -X POST -H "Content-Type: application/json" -d '{"id":3,"name":"test","role":"USER","password":"test","firstName":null,"lastName":null,"phone":null,"address":null,"selection":null}' -b cookie.txt
  * curl 0.0.0.0:8080/user -b cookie.txt
  * curl 0.0.0.0:8080/user/3 -b cookie.txt
@@ -78,7 +79,7 @@ private fun Routing.componentRouting() = route("/component") {
 
 private fun Routing.userRouting() {
     authenticate(AUTH_FORM) { post("/login") { userService.login() } }
-    authAny {
+    authUser {
         post("/logout") { userService.logout() }
         post("/select") { userService.select() }
         get("/selected") { userService.selected() }
