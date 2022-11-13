@@ -1,8 +1,7 @@
 package com.example.plugins
 
 import com.example.db.models.ID
-import com.example.service.componentService
-import com.example.service.userService
+import com.example.service.*
 import io.ktor.http.*
 import io.ktor.server.routing.*
 import io.ktor.server.http.content.*
@@ -32,8 +31,8 @@ suspend inline fun ApplicationCall.respondOkIfTrueWithIdParameter(crossinline re
 = doIfIdParameterIsNotNull { respondOkIfTrue(responseMaker(it)) }
 
 private typealias Pipeline = PipelineContext<Unit, ApplicationCall>
-private val Pipeline.componentService get() = call.componentService
-private val Pipeline.userService get() = call.userService
+private val Pipeline.componentService get() = call.service(ComponentService)
+private val Pipeline.userService get() = call.service(UserService)
 private const val idParam = "/{id}"
 
 /**
@@ -81,9 +80,10 @@ private fun Routing.userRouting() {
     authenticate(AUTH_FORM) { post("/login") { userService.login() } }
     authAny {
         post("/logout") { userService.logout() }
-        post("/select/$idParam") { userService.select() }
+        post("/select") { userService.select() }
         get("/selected") { userService.selected() }
         post("/clearSelected") { userService.clearSelected() }
+        post("/order") { userService.order() }
     }
     authAdmin { route("/user") {
         post { userService.add() }

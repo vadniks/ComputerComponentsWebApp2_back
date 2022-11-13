@@ -1,6 +1,7 @@
 package com.example.service
 
 import com.example.db.models.Selection
+import com.example.db.models.UserDetails
 import com.example.db.models.set
 import com.example.db.models.toSelection
 import com.example.db.repo.UsersRepo
@@ -8,13 +9,10 @@ import com.example.db.repo.UsersRepo.getSelection
 import com.example.db.repo.UsersRepo.setSelection
 import com.example.plugins.*
 import com.example.plugins.UserIdPrincipal
-import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
-
-val ApplicationCall.userService get() = UserService.also { it.call = this }
 
 object UserService : AbsService() {
 
@@ -53,6 +51,20 @@ object UserService : AbsService() {
     suspend fun clearSelected() = call.doIfUserIdFound {
         setSelection(it, null)
         call.respondOk()
+    }
+
+    suspend fun order() = call.doIfUserIdFound {
+        val details = call.receive<UserDetails>()
+
+        val user = UsersRepo.getBy(it)
+        if (user == null) { call.respondUserError(); return@doIfUserIdFound }
+
+        call.respondOkIfTrue(UsersRepo.update(it, user.copy(
+            firstName = details.firstName,
+            lastName = details.lastName,
+            phone = details.phone,
+            address = details.address
+        )))
     }
 
     suspend fun getAll() = call.respond(UsersRepo.getAll())

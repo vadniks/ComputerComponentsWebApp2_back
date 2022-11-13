@@ -1,8 +1,9 @@
 package com.example.db.models
 
 import org.jetbrains.exposed.sql.Table
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class User(
     val id: Int?,
     val name: String,
@@ -20,6 +21,9 @@ data class User(
         null, null, null, null, null
     )
 }
+
+@Serializable
+data class UserDetails(val firstName: String, val lastName: String, val phone: Int, val address: String)
 
 const val NAME = "name"
 const val ROLE = "role"

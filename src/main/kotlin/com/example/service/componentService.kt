@@ -2,11 +2,8 @@ package com.example.service
 
 import com.example.db.repo.ComponentsRepo
 import com.example.plugins.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
-
-val ApplicationCall.componentService get() = ComponentService.also { it.call = this }
 
 object ComponentService : AbsService() {
     suspend fun add() = call.respondOkIfTrue(ComponentsRepo.addIfNotExists(call.receive()))
