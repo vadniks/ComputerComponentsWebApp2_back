@@ -10,7 +10,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 
-val Any.unitStub get() = Unit
+@Suppress("unused") val Any.unitStub get() = Unit
 
 fun main() = embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
     configureSecurity()
