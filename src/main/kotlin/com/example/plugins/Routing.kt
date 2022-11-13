@@ -1,7 +1,6 @@
 package com.example.plugins
 
 import com.example.db.models.ID
-import com.example.plugins.Pipeline
 import com.example.service.componentService
 import com.example.service.userService
 import io.ktor.http.*
@@ -32,6 +31,11 @@ suspend inline fun <reified T> ApplicationCall.respondIfIdParameterIsNotNull(cro
 suspend inline fun ApplicationCall.respondOkIfTrueWithIdParameter(crossinline responseMaker: suspend (Int) -> Boolean)
 = doIfIdParameterIsNotNull { respondOkIfTrue(responseMaker(it)) }
 
+private typealias Pipeline = PipelineContext<Unit, ApplicationCall>
+private val Pipeline.componentService get() = call.componentService
+private val Pipeline.userService get() = call.userService
+private const val idParam = "/{id}"
+
 /**
  * curl 0.0.0.0:8080/component
  * curl 0.0.0.0:8080/component/1
@@ -44,6 +48,11 @@ suspend inline fun ApplicationCall.respondOkIfTrueWithIdParameter(crossinline re
  * curl 0.0.0.0:8080/selected -b cookie.txt
  * curl 0.0.0.0:8080/select/1 -X POST -b cookie.txt
  * curl 0.0.0.0:8080/clearSelected -X POST -b cookie.txt
+ * curl 0.0.0.0:8080/user -X POST -H "Content-Type: application/json" -d '{"id":3,"name":"test","role":"USER","password":"test","firstName":null,"lastName":null,"phone":null,"address":null,"selection":null}' -b cookie.txt
+ * curl 0.0.0.0:8080/user -b cookie.txt
+ * curl 0.0.0.0:8080/user/3 -b cookie.txt
+ * curl 0.0.0.0:8080/user/3 -X PUT -H "Content-Type: application/json" -d '{"id":3,"name":"test","role":"USER","password":"pass","firstName":null,"lastName":null,"phone":null,"address":null,"selection":null}' -b cookie.txt
+ * curl 0.0.0.0:8080/user/3 -X DELETE -b cookie.txt
  */
 fun Application.configureRouting() = routing {
     componentRouting()
@@ -58,14 +67,10 @@ private fun Routing.staticRouting() = static {
     }
 }
 
-private typealias Pipeline = PipelineContext<Unit, ApplicationCall>
-private val Pipeline.componentService get() = call.componentService
-private val Pipeline.userService get() = call.userService
-
 private fun Routing.componentRouting() = route("/component") {
     authAdmin { post { componentService.add() } }
     get { componentService.getAll() }
-    route("/{id}") {
+    route(idParam) {
         get { componentService.getById() }
         authAdmin { put { componentService.update() } }
         authAdmin { delete { componentService.delete() } }
@@ -76,15 +81,17 @@ private fun Routing.userRouting() {
     authenticate(AUTH_FORM) { post("/login") { userService.login() } }
     authAny {
         post("/logout") { userService.logout() }
-        post("/select/{id}") { userService.select() }
+        post("/select/$idParam") { userService.select() }
         get("/selected") { userService.selected() }
         post("/clearSelected") { userService.clearSelected() }
     }
     authAdmin { route("/user") {
         post { userService.add() }
         get { userService.getAll() }
-        get("/{id}") { userService.getById() }
-        put { userService.update() }
-        delete { userService.delete() }
+        route(idParam) {
+            get { userService.getById() }
+            put { userService.update() }
+            delete { userService.delete() }
+        }
     } }
 }
