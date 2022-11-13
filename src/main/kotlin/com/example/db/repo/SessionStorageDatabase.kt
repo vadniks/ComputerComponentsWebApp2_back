@@ -19,7 +19,7 @@ class SessionStorageDatabase : SessionStorage {
 
     override suspend fun write(id: String, value: String): Unit = dbQuery {
         Sessions.update({ Sessions.id eq id }) { it[Sessions.value] = value }.takeIf { it == 1 }
-            ?: Sessions.insert { it[Sessions.id] = id;it[Sessions.value] = value }.takeIf { it.insertedCount == 1 }
+            ?: Sessions.insert { it[Sessions.id] = id; it[Sessions.value] = value }.takeIf { it.insertedCount == 1 }
             ?: throw IllegalStateException()
     }.unitStub
 }

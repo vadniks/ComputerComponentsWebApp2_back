@@ -21,11 +21,8 @@ suspend fun ApplicationCall.respondOkITrue(result: Boolean) = if (result) respon
 suspend inline fun ApplicationCall.doIfUserIdFound(crossinline action: suspend (Int) -> Unit)
 = sessions.get<UserIdPrincipal>()?.id.apply { if (this != null) action(this) else respondUserError() }
 
-suspend inline fun ApplicationCall.doIfIdParameterIsNotNull(crossinline action: suspend (Int) -> Unit) {
-    val id = getIdParameter()
-    if (id != null) action(id)
-    else respondUserError()
-}
+suspend inline fun ApplicationCall.doIfIdParameterIsNotNull(crossinline action: suspend (Int) -> Unit)
+= getIdParameter().apply { if (this != null) action(this) else respondUserError() }
 
 suspend inline fun <reified T> ApplicationCall.respondIfIdParameterIsNotNull(crossinline responseMaker: suspend (Int) -> T)
 = getIdParameter().apply { respondNullable(if (this != null) responseMaker(this) else null) }
