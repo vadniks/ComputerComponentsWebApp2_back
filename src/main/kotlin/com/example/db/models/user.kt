@@ -7,7 +7,6 @@ data class User(
     val name: String,
     val role: Role,
     val password: String,
-    val token: String?,
     val firstName: String?,
     val lastName: String?,
     val phone: Int?,
@@ -17,14 +16,13 @@ data class User(
     constructor(name: String, role: Role, password: String) : this(
         null,
         name, role, password,
-        null, null, null, null, null, null
+        null, null, null, null, null
     )
 }
 
 const val NAME = "name"
 const val ROLE = "role"
 const val PASSWORD = "password"
-const val TOKEN = "token"
 const val FIRST_NAME = "firstName"
 const val LAST_NAME = "lastName"
 const val PHONE = "phone"
@@ -38,7 +36,6 @@ object Users : Table() {
     val name = varchar(NAME, LENGTH_MIDDLE).index()
     val role = enumeration<Role>(ROLE)
     val password = varchar(PASSWORD, LENGTH_MIDDLE)
-    val token = varchar(TOKEN, LENGTH_MIDDLE).nullable().uniqueIndex()
     val firstName = varchar(FIRST_NAME, LENGTH_MIDDLE).nullable().index()
     val lastName = varchar(LAST_NAME, LENGTH_MIDDLE).nullable().index()
     val phone = integer(PHONE).nullable().uniqueIndex()

@@ -13,7 +13,6 @@ import com.example.db.models.Users.password
 import com.example.db.models.Users.phone
 import com.example.db.models.Users.role
 import com.example.db.models.Users.selection
-import com.example.db.models.Users.token
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -22,8 +21,9 @@ import org.jetbrains.exposed.sql.statements.UpdateBuilder
 object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
 
     override fun resultRowToEntity(row: ResultRow): User = User(
-        row[id],        row[name],     row[role],  row[password], row[token],
-        row[firstName], row[lastName], row[phone], row[address],  row[selection]
+        row[id],       row[name],      row[role],
+        row[password], row[firstName], row[lastName],
+        row[phone],    row[address],   row[selection]
     )
 
     @Suppress("DuplicatedCode")
@@ -32,7 +32,6 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
         it[name] = entity.name
         it[role] = entity.role
         it[password] = entity.password
-        it[token] = entity.token
         it[firstName] = entity.firstName
         it[lastName] = entity.lastName
         it[phone] = entity.phone
@@ -45,7 +44,6 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
         (name eq entity.name) and
         (role eq entity.role) and
         (password eq entity.password) and
-        (token eq entity.token) and
         (firstName eq entity.firstName) and
         (lastName eq entity.lastName) and
         (phone eq entity.phone) and
@@ -58,10 +56,6 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
         User("admin", Role.ADMIN, "admin"),
         User("user", Role.USER, "user")
     )
-
-    suspend fun getId(token: String): Int? = getSingle(Users.token eq token, id)
-
-    suspend fun setToken(id: Int, token: String): Boolean = updateSingle(Users.id eq id, Users.token, token)
 
     suspend fun checkRole(id: Int, role: Role): Boolean = getSingle(Users.id eq id, Users.role) == role
 
