@@ -1,8 +1,9 @@
 package com.example.plugins
 
 import com.example.db.models.ID
-import com.example.service.ComponentService
-import com.example.service.UserService
+import com.example.plugins.Pipeline
+import com.example.service.componentService
+import com.example.service.userService
 import io.ktor.http.*
 import io.ktor.server.routing.*
 import io.ktor.server.http.content.*
@@ -10,13 +11,14 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
+import io.ktor.util.pipeline.*
 
 fun ApplicationCall.getIdParameter() = parameters[ID]?.toIntOrNull()
 suspend fun ApplicationCall.respondOk() = respond(HttpStatusCode.OK)
 suspend fun ApplicationCall.respondUserError() = respond(HttpStatusCode.BadRequest)
 private fun Route.authAdmin(build: Route.() -> Unit) = authenticate(SESSION_ADMIN, build = build)
 private fun Route.authAny(build: Route.() -> Unit) = authenticate(SESSION_USER, SESSION_ADMIN, build = build)
-suspend fun ApplicationCall.respondOkITrue(result: Boolean) = if (result) respondOk() else respondUserError()
+suspend fun ApplicationCall.respondOkIfTrue(result: Boolean) = if (result) respondOk() else respondUserError()
 
 suspend inline fun ApplicationCall.doIfUserIdFound(crossinline action: suspend (Int) -> Unit)
 = sessions.get<UserIdPrincipal>()?.id.apply { if (this != null) action(this) else respondUserError() }
@@ -26,6 +28,9 @@ suspend inline fun ApplicationCall.doIfIdParameterIsNotNull(crossinline action: 
 
 suspend inline fun <reified T> ApplicationCall.respondIfIdParameterIsNotNull(crossinline responseMaker: suspend (Int) -> T)
 = getIdParameter().apply { respondNullable(if (this != null) responseMaker(this) else null) }
+
+suspend inline fun ApplicationCall.respondOkIfTrueWithIdParameter(crossinline responseMaker: suspend (Int) -> Boolean)
+= doIfIdParameterIsNotNull { respondOkIfTrue(responseMaker(it)) }
 
 /**
  * curl 0.0.0.0:8080/component
@@ -53,20 +58,33 @@ private fun Routing.staticRouting() = static {
     }
 }
 
+private typealias Pipeline = PipelineContext<Unit, ApplicationCall>
+private val Pipeline.componentService get() = call.componentService
+private val Pipeline.userService get() = call.userService
+
 private fun Routing.componentRouting() = route("/component") {
-    authAdmin { post { ComponentService.add(call) } }
-    get { ComponentService.getAll(call) }
+    authAdmin { post { componentService.add() } }
+    get { componentService.getAll() }
     route("/{id}") {
-        get { ComponentService.getById(call) }
-        authAdmin { put { ComponentService.update(call) } }
-        authAdmin { delete { ComponentService.delete(call) } }
+        get { componentService.getById() }
+        authAdmin { put { componentService.update() } }
+        authAdmin { delete { componentService.delete() } }
     }
 }
 
 private fun Routing.userRouting() {
-    authenticate(AUTH_FORM) { post("/login") { UserService.login(call) } }
-    authAny { post("/logout") { UserService.logout(call) } }
-    authAny { post("/select/{id}") { UserService.select(call) } }
-    authAny { get("/selected") { UserService.selected(call) } }
-    authAny { post("/clearSelected") { UserService.clearSelected(call) } }
+    authenticate(AUTH_FORM) { post("/login") { userService.login() } }
+    authAny {
+        post("/logout") { userService.logout() }
+        post("/select/{id}") { userService.select() }
+        get("/selected") { userService.selected() }
+        post("/clearSelected") { userService.clearSelected() }
+    }
+    authAdmin { route("/user") {
+        post { userService.add() }
+        get { userService.getAll() }
+        get("/{id}") { userService.getById() }
+        put { userService.update() }
+        delete { userService.delete() }
+    } }
 }

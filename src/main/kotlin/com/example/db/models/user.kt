@@ -2,6 +2,7 @@ package com.example.db.models
 
 import org.jetbrains.exposed.sql.Table
 
+@kotlinx.serialization.Serializable
 data class User(
     val id: Int?,
     val name: String,
