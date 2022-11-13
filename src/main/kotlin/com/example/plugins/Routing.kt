@@ -67,7 +67,7 @@ private fun Routing.componentRouting() = route("/component") {
 }
 
 private fun Routing.userRouting() {
-    authenticate(FORM) { post("/login") { UserService.login(call) } }
+    authenticate(AUTH_FORM) { post("/login") { UserService.login(call) } }
     authAny { post("/logout") { UserService.logout(call) } }
     authAny { post("/select/{id}") { UserService.select(call) } }
     authAny { get("/selected") { UserService.selected(call) } }
