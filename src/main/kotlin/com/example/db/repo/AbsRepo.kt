@@ -49,9 +49,9 @@ abstract class AbsRepo<E, T: Table, C>(private val table: T, private val idColum
 
     suspend fun delete(id: C): Boolean = dbQuery { table.deleteWhere { idColumn eq id } == 1 }
 
-    init { runBlocking { dbQuery { exec("select count(*) from " + table.tableName) {
-        assert(it.next())
-        if (it.getInt(1) == 0) addTests(*testEntities())
+    init { runBlocking { dbQuery { it.exec("select count(*) from " + table.tableName) { resultSet ->
+        assert(resultSet.next())
+        if (resultSet.getInt(1) == 0) addTests(*testEntities())
     } } } }
 
     @TestOnly private fun addTests(vararg entities: E) = runBlocking { entities.forEach { addIfNotExists(it) } }

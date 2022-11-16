@@ -32,7 +32,7 @@ object ComponentsRepo : AbsRepo<Component, Components, Int>(Components, id) {
     }
 
     override suspend fun exactPresents(entity: Component): Boolean = dbQuery { !Components.select(
-        (if (entity.id != null) Components.id eq entity.id else Op.TRUE) and
+        (if (entity.id != null) id eq entity.id else Op.TRUE) and
         (title eq entity.title) and
         (type eq entity.type) and
         (description eq entity.description) and

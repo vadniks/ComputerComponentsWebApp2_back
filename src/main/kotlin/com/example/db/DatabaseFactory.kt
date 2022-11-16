@@ -18,5 +18,5 @@ object DatabaseFactory {
         "postgres"
     )) { SchemaUtils.create(Components, Users, Sessions) } }
 
-    suspend fun <T> dbQuery(block: suspend Transaction.() -> T): T = newSuspendedTransaction { block(this) }
+    suspend fun <T> dbQuery(block: suspend (Transaction) -> T): T = newSuspendedTransaction { block(this) }
 }
