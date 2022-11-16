@@ -39,7 +39,7 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
     }
 
     override suspend fun exactPresents(entity: User): Boolean = dbQuery { !Users.select(
-        (if (entity.id != null) id eq entity.id else Op.TRUE) and
+        (if (entity.id != null) Users.id eq entity.id else Op.TRUE) and
         (name eq entity.name) and
         (role eq entity.role) and
         (password eq entity.password) and

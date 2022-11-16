@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
+import java.util.logging.Logger
 
 abstract class AbsRepo<E, T: Table, C>(private val table: T, private val idColumn: Column<C>) {
 
@@ -44,11 +45,14 @@ abstract class AbsRepo<E, T: Table, C>(private val table: T, private val idColum
     = dbQuery { table.update({ idColumn eq id }) { setValues(it, entity) } == 1 }
 
     protected suspend fun <T> updateSingle(selection: Op<Boolean>, which: Column<T>, what: T): Boolean
-    = dbQuery { Users.update({selection}) { it[which] = what } == 1 }
+    = dbQuery { Users.update({ selection }) { it[which] = what } == 1 }
 
     suspend fun delete(id: C): Boolean = dbQuery { table.deleteWhere { idColumn eq id } == 1 }
 
-    init { if (table.select { Op.TRUE }.empty()) addTests() }
+    init { runBlocking { dbQuery { exec("select count(*) from " + table.tableName) {
+        assert(it.next())
+        if (it.getInt(1) == 0) addTests(*testEntities())
+    } } } }
 
     @TestOnly private fun addTests(vararg entities: E) = runBlocking { entities.forEach { addIfNotExists(it) } }
 
