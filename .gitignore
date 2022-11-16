@@ -40,3 +40,4 @@ gradlew
 gradlew.bat
 /src/main/resources/static/.last_build_id
 /cookie.txt
+/tmp/db

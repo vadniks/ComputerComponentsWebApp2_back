@@ -26,7 +26,6 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
         row[phone],    row[address],   row[selection]
     )
 
-    @Suppress("DuplicatedCode")
     override fun setValues(it: UpdateBuilder<Int>, entity: User) {
         if (entity.id != null) it[id] = entity.id
         it[name] = entity.name

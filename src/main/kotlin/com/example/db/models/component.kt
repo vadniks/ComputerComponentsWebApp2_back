@@ -34,6 +34,8 @@ enum class Type(val type: Int, val title: String) {
     CASE(8, "Case")
 }
 
+fun Int.toType() = Type.values().find { it.type == this }
+
 data class Selection(
     var cpu: Int? = null, var mb: Int? = null, var gpu: Int? = null,
     var ram: Int? = null, var hdd: Int? = null, var ssd: Int? = null,

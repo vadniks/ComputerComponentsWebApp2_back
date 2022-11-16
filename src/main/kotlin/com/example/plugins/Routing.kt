@@ -1,6 +1,7 @@
 package com.example.plugins
 
 import com.example.db.models.ID
+import com.example.db.models.TYPE
 import com.example.service.*
 import io.ktor.http.*
 import io.ktor.server.routing.*
@@ -75,9 +76,11 @@ private fun Routing.componentRouting() = route("/component") {
         authAdmin { put { componentService.update() } }
         authAdmin { delete { componentService.delete() } }
     }
+    get("/type/{$TYPE}") { componentService.getByType() }
 }
 
 private fun Routing.userRouting() {
+    post("/register") {  }
     authenticate(AUTH_FORM) { post("/login") { userService.login() } }
     authUser {
         post("/logout") { userService.logout() }
