@@ -66,7 +66,7 @@ object UserService : AbsService() {
         )))
     }
 
-    private fun hash(value: String) = hex(MessageDigest.getInstance("SHA-256").digest(value.encodeToByteArray()))
+    fun hash(value: String) = hex(MessageDigest.getInstance("SHA-256").digest(value.encodeToByteArray()))
 
     suspend fun register() = call.receive<UserCredentials>().run {
         if (call.principal<UserIdPrincipal>() != null) { call.respondUserError(); return }

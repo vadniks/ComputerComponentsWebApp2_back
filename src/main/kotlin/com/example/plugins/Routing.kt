@@ -42,6 +42,8 @@ private const val idParam = "/{id}"
  * curl 0.0.0.0:8080/component -X POST -H "Content-Type: application/json" -d '{"id":2,"title":"a","type":"MB","description":"b","cost":200,"image":null}' -b cookie.txt
  * curl 0.0.0.0:8080/component/2 -X PUT -H "Content-Type: application/json" -d '{"id":2,"title":"a","type":"MB","description":"b","cost":111,"image":null}' -b cookie.txt
  * curl 0.0.0.0:8080/component/2 -X DELETE -b cookie.txt
+ * curl 0.0.0.0:8080/component/type/0
+ * curl 0.0.0.0:8080/register -X POST -H "Content-Type: application/json" -d '{"name":"test","password":"pass"}'
  * curl 0.0.0.0:8080/login -X POST -F 'name=user' -F 'password=user' -c cookie.txt
  * curl 0.0.0.0:8080/login -X POST -F 'name=admin' -F 'password=admin' -c cookie.txt
  * curl 0.0.0.0:8080/logout -X POST -b cookie.txt -c cookie.txt

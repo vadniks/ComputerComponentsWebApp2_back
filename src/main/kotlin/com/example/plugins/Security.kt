@@ -5,6 +5,7 @@ import com.example.db.models.PASSWORD
 import com.example.db.models.Role
 import com.example.db.repo.SessionStorageDatabase
 import com.example.db.repo.UsersRepo
+import com.example.service.UserService
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.sessions.*
@@ -28,7 +29,7 @@ private fun sessionConfig(role: Role): SessionAuthenticationProvider.Config<User
 }
 
 private val auth: suspend ApplicationCall.(UserPasswordCredential) -> UserIdPrincipal? = {
-    val id = UsersRepo.checkCredentials(it.name, it.password)
+    val id = UsersRepo.checkCredentials(it.name, UserService.hash(it.password))
     if (id == null || id < 1) null
     else UserIdPrincipal(id)
 }
