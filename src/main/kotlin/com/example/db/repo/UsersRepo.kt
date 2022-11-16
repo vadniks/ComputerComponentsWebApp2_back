@@ -65,4 +65,6 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
         updateSingle(Users.id eq id, Users.selection, selection)
 
     suspend fun getSelection(id: Int): String? = getSingle(Users.id eq id, selection)
+
+    suspend fun nameExists(name: String): Boolean = getSingle(Users.name eq name, id) != null
 }

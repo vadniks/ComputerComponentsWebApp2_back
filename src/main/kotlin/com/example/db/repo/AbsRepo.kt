@@ -50,7 +50,7 @@ abstract class AbsRepo<E, T: Table, C>(private val table: T, private val idColum
 
     init { if (table.select { Op.TRUE }.empty()) addTests() }
 
-    @TestOnly fun addTests(vararg entities: E) = runBlocking { entities.forEach { addIfNotExists(it) } }
+    @TestOnly private fun addTests(vararg entities: E) = runBlocking { entities.forEach { addIfNotExists(it) } }
 
     @TestOnly abstract fun testEntities(): Array<E>
 }

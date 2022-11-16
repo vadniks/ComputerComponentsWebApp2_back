@@ -25,6 +25,9 @@ data class User(
 @Serializable
 data class UserDetails(val firstName: String, val lastName: String, val phone: Int, val address: String)
 
+@Serializable
+data class UserCredentials(val name: String, val password: String)
+
 const val NAME = "name"
 const val ROLE = "role"
 const val PASSWORD = "password"
@@ -38,7 +41,7 @@ enum class Role(val role: Int) { USER(0), ADMIN(1) }
 
 object Users : Table() {
     val id = integer(ID).autoIncrement()
-    val name = varchar(NAME, LENGTH_MIDDLE).index()
+    val name = varchar(NAME, LENGTH_MIDDLE).uniqueIndex()
     val role = enumeration<Role>(ROLE)
     val password = varchar(PASSWORD, LENGTH_MIDDLE)
     val firstName = varchar(FIRST_NAME, LENGTH_MIDDLE).nullable().index()

@@ -80,7 +80,7 @@ private fun Routing.componentRouting() = route("/component") {
 }
 
 private fun Routing.userRouting() {
-    post("/register") {  }
+    authenticate(SESSION_USER, SESSION_ADMIN, optional = true) { post("/register") { userService.register() } }
     authenticate(AUTH_FORM) { post("/login") { userService.login() } }
     authUser {
         post("/logout") { userService.logout() }

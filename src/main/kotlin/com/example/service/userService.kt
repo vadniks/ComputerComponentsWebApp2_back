@@ -1,9 +1,6 @@
 package com.example.service
 
-import com.example.db.models.Selection
-import com.example.db.models.UserDetails
-import com.example.db.models.set
-import com.example.db.models.toSelection
+import com.example.db.models.*
 import com.example.db.repo.UsersRepo
 import com.example.db.repo.UsersRepo.getSelection
 import com.example.db.repo.UsersRepo.setSelection
@@ -13,6 +10,8 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
+import io.ktor.util.*
+import java.security.MessageDigest
 
 object UserService : AbsService() {
 
@@ -64,6 +63,18 @@ object UserService : AbsService() {
             lastName = details.lastName,
             phone = details.phone,
             address = details.address
+        )))
+    }
+
+    private fun hash(value: String) = hex(MessageDigest.getInstance("SHA-256").digest(value.encodeToByteArray()))
+
+    suspend fun register() = call.receive<UserCredentials>().run {
+        if (call.principal<UserIdPrincipal>() != null) { call.respondUserError(); return }
+        if (UsersRepo.nameExists(this.name)) call.respondUserError()
+        else call.respondOkIfTrue(UsersRepo.addIfNotExists(User(
+            name = this.name,
+            password = hash(this.password),
+            role = Role.USER
         )))
     }
 
