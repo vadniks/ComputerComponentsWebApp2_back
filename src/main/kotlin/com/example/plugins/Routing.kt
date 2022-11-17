@@ -56,6 +56,8 @@ private const val idParam = "/{id}"
  * curl 0.0.0.0:8080/user/3 -b cookie.txt
  * curl 0.0.0.0:8080/user/3 -X PUT -H "Content-Type: application/json" -d '{"id":3,"name":"test","role":"USER","password":"pass","firstName":null,"lastName":null,"phone":null,"address":null,"selection":null}' -b cookie.txt
  * curl 0.0.0.0:8080/user/3 -X DELETE -b cookie.txt
+ * curl 0.0.0.0:8080/authorizedU
+ * curl 0.0.0.0:8080/authorizedA
  */
 fun Application.configureRouting() = routing {
     componentRouting()
@@ -85,12 +87,14 @@ private fun Routing.userRouting() {
     authenticate(SESSION_USER, SESSION_ADMIN, optional = true) { post("/register") { userService.register() } }
     authenticate(AUTH_FORM) { post("/login") { userService.login() } }
     authUser {
+        get("/authorizedU") { userService.authorized() }
         post("/logout") { userService.logout() }
         post("/select") { userService.select() }
         get("/selected") { userService.selected() }
         post("/clearSelected") { userService.clearSelected() }
         post("/order") { userService.order() }
     }
+    authAdmin { get("/authorizedA") { userService.authorized() } }
     authAdmin { route("/user") {
         post { userService.add() }
         get { userService.getAll() }
