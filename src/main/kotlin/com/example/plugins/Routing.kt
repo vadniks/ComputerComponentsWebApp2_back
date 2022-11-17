@@ -67,9 +67,8 @@ fun Application.configureRouting() = routing {
 
 private fun Routing.staticRouting() = static {
     resource("/", "/static/index.html")
-    static("/") {
-        resources("static")
-    }
+    static("/") { resources("static") }
+    static("/assets") { resources("static/assets") }
 }
 
 private fun Routing.componentRouting() = route("/component") {

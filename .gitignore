@@ -41,3 +41,5 @@ gradlew.bat
 /src/main/resources/static/.last_build_id
 /cookie.txt
 /tmp/db
+/src/main/resources/static/*
+!/src/main/resources/static/res_back
