@@ -91,16 +91,18 @@ private fun Routing.componentRouting() = route("/component") {
 }
 
 private fun Routing.userRouting() {
-    authenticate(SESSION_USER, SESSION_ADMIN, optional = true) { post("/register") { userService.register() } }
+    authenticate(SESSION_USER, SESSION_ADMIN, optional = true) {
+        post("/register") { userService.register() }
+        post("/logout") { userService.logout() }
+        get("/name") { userService.name() }
+    }
     authenticate(AUTH_FORM) { post("/login") { userService.login() } }
     authUser {
         get("/authorizedU") { userService.authorized() }
-        post("/logout") { userService.logout() }
         post("/select/$idParam") { userService.select() }
         get("/selected") { userService.selected() }
         post("/clearSelected") { userService.clearSelected() }
         post("/order") { userService.order() }
-        get("/name") { userService.name() }
     }
     authAdmin { get("/authorizedA") { userService.authorized() } }
     authAdmin { route("/user") {
