@@ -51,6 +51,7 @@ private const val idParam = "/{id}"
  * curl 0.0.0.0:8080/select/1 -X POST -b cookie.txt
  * curl 0.0.0.0:8080/clearSelected -X POST -b cookie.txt
  * curl 0.0.0.0:8080/order -X POST -H "Content-Type: application/json" -d '{"firstName":"fn","lastName":"ln","phone":1234567890,"address":"address"}' -b cookie.txt
+ * curl 0.0.0.0:8080/name -b cookie.txt
  * curl 0.0.0.0:8080/user -X POST -H "Content-Type: application/json" -d '{"id":3,"name":"test","role":"USER","password":"test","firstName":null,"lastName":null,"phone":null,"address":null,"selection":null}' -b cookie.txt
  * curl 0.0.0.0:8080/user -b cookie.txt
  * curl 0.0.0.0:8080/user/3 -b cookie.txt
@@ -92,6 +93,7 @@ private fun Routing.userRouting() {
         get("/selected") { userService.selected() }
         post("/clearSelected") { userService.clearSelected() }
         post("/order") { userService.order() }
+        get("/name") { userService.name() }
     }
     authAdmin { get("/authorizedA") { userService.authorized() } }
     authAdmin { route("/user") {

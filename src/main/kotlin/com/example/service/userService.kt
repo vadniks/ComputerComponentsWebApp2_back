@@ -78,6 +78,8 @@ object UserService : AbsService() {
         )))
     }
 
+    suspend fun name() = call.doIfUserIdFound { call.respondNullable(UsersRepo.getName(it)) }
+
     suspend fun authorized() = call.respondOk()
     suspend fun getAll() = call.respond(UsersRepo.getAll())
     suspend fun getById() = call.respondIfIdParameterIsNotNull { UsersRepo.getBy(it) }
