@@ -34,6 +34,7 @@ suspend inline fun ApplicationCall.respondOkIfTrueWithIdParameter(crossinline re
 private typealias Pipeline = PipelineContext<Unit, ApplicationCall>
 private val Pipeline.componentService get() = call.service(ComponentService)
 private val Pipeline.userService get() = call.service(UserService)
+private val Pipeline.sessionService get() = call.service(SessionService)
 private const val idParam = "/{id}"
 
 /**
@@ -59,10 +60,16 @@ private const val idParam = "/{id}"
  * curl 0.0.0.0:8080/user/3 -X DELETE -b cookie.txt
  * curl 0.0.0.0:8080/authorizedU
  * curl 0.0.0.0:8080/authorizedA
+ * curl 0.0.0.0:8080/session -b cookie.txt
+ * curl 0.0.0.0:8080/session/a -b cookie.txt
+ * curl 0.0.0.0:8080/session -X POST -H "Content-Type: application/json" -d '{"id":"a","value":"b"}' -b cookie.txt
+ * curl 0.0.0.0:8080/session/a -X PUT -H "Content-Type: application/json" -d '{"id":"a","value":"bb"}' -b cookie.txt
+ * curl 0.0.0.0:8080/session/a -X DELETE -b cookie.txt
  */
 fun Application.configureRouting() = routing {
     componentRouting()
     userRouting()
+    sessionRouting()
     staticRouting()
 }
 
@@ -106,3 +113,13 @@ private fun Routing.userRouting() {
         }
     } }
 }
+
+private fun Routing.sessionRouting() = authAdmin { route("/session") {
+    get { sessionService.getAll() }
+    post { sessionService.add() }
+    route(idParam) {
+        get { sessionService.getById() }
+        put { sessionService.update() }
+        delete { sessionService.delete() }
+    }
+} }

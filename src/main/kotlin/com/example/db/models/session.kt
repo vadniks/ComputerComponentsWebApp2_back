@@ -1,6 +1,10 @@
 package com.example.db.models
 
+import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
+
+@Serializable
+data class Session(val id: String, val value: String)
 
 const val VALUE = "value"
 

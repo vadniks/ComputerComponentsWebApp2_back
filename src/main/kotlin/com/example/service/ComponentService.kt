@@ -2,7 +2,6 @@ package com.example.service
 
 import com.example.db.models.Component
 import com.example.db.models.TYPE
-import com.example.db.models.Type
 import com.example.db.models.toType
 import com.example.db.repo.ComponentsRepo
 import com.example.plugins.*
