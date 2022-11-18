@@ -88,7 +88,7 @@ private fun Routing.userRouting() {
     authUser {
         get("/authorizedU") { userService.authorized() }
         post("/logout") { userService.logout() }
-        post("/select") { userService.select() }
+        post("/select/$idParam") { userService.select() }
         get("/selected") { userService.selected() }
         post("/clearSelected") { userService.clearSelected() }
         post("/order") { userService.order() }

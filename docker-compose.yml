@@ -18,7 +18,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
-    container_name: cursov_db
+    container_name: cursov_db # docker exec -it cursov_db bash # psql db postgres
 #  redis:
 #    container_name: redis
 #    image: redis
