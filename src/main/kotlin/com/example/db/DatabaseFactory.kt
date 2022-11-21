@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object DatabaseFactory {
 
     init { transaction(Database.connect(
-        "jdbc:postgresql://localhost:5432/db",
+        "jdbc:postgresql://db:5432/db",
         "org.postgresql.Driver",
         "postgres",
         "postgres"
