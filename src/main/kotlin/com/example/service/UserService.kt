@@ -52,6 +52,22 @@ object UserService : AbsService() {
         call.respondOk()
     }
 
+    suspend fun logSelection() = call.doIfUserIdFound {
+        val user = UsersRepo.getBy(it)
+        if (user == null) { call.respondUserError(); return@doIfUserIdFound }
+
+        call.respondOkIfTrue(UsersRepo.setSelections(it, UsersRepo.getSelections(it) + ':' + call.receive<String>()))
+    }
+
+    suspend fun selectionHistory() = call.doIfUserIdFound { call.respondNullable(UsersRepo.getSelections(it)) }
+
+    suspend fun clearHistory() = call.doIfUserIdFound {
+        val user = UsersRepo.getBy(it)
+        if (user == null) { call.respondUserError(); return@doIfUserIdFound }
+
+        call.respondOkIfTrue(UsersRepo.setSelections(it, null))
+    }
+
     suspend fun order() = call.doIfUserIdFound {
         val details = call.receive<UserDetails>()
 

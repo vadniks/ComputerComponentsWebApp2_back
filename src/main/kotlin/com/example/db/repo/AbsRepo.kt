@@ -45,7 +45,7 @@ abstract class AbsRepo<E, T: Table, C>(private val table: T, private val idColum
     = dbQuery { table.update({ idColumn eq id }) { setValues(it, entity) } == 1 }
 
     protected suspend fun <T> updateSingle(selection: Op<Boolean>, which: Column<T>, what: T): Boolean
-    = dbQuery { Users.update({ selection }) { it[which] = what } == 1 }
+    = dbQuery { table.update({ selection }) { it[which] = what } == 1 }
 
     suspend fun delete(id: C): Boolean = dbQuery { table.deleteWhere { idColumn eq id } == 1 }
 

@@ -13,12 +13,13 @@ data class User(
     val lastName: String?,
     val phone: Int?,
     val address: String?,
-    val selection: String?
+    val selection: String?,
+    val selections: String?
 ) {
     constructor(name: String, role: Role, password: String) : this(
         null,
         name, role, password,
-        null, null, null, null, null
+        null, null, null, null, null, null
     )
 }
 
@@ -36,6 +37,7 @@ const val LAST_NAME = "lastName"
 const val PHONE = "phone"
 const val ADDRESS = "address"
 const val SELECTION = "selection"
+const val SELECTIONS = "selections"
 
 enum class Role(val role: Int) { USER(0), ADMIN(1) }
 
@@ -49,6 +51,7 @@ object Users : Table() {
     val phone = integer(PHONE).nullable().uniqueIndex()
     val address = varchar(ADDRESS, LENGTH_LONG).nullable().index()
     val selection = varchar(SELECTION, LENGTH_MIDDLE).nullable()
+    val selections = text(SELECTIONS).nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

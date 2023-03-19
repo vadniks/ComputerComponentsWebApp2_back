@@ -84,8 +84,10 @@ private fun Routing.componentRouting() = route("/component") {
     get { componentService.getAll() }
     route(idParam) {
         get { componentService.getById() }
-        authAdmin { put { componentService.update() } }
-        authAdmin { delete { componentService.delete() } }
+        authAdmin {
+            put { componentService.update() }
+            delete { componentService.delete() }
+        }
     }
     get("/type/{$TYPE}") { componentService.getByType() }
 }
@@ -102,18 +104,23 @@ private fun Routing.userRouting() {
         post("/select/$idParam") { userService.select() }
         get("/selected") { userService.selected() }
         post("/clearSelected") { userService.clearSelected() }
+        get("/history") { userService.selectionHistory() }
+        post("/history") { userService.logSelection() }
+        delete("/history") { userService.clearHistory() }
         post("/order") { userService.order() }
     }
-    authAdmin { get("/authorizedA") { userService.authorized() } }
-    authAdmin { route("/user") {
-        post { userService.add() }
-        get { userService.getAll() }
-        route(idParam) {
-            get { userService.getById() }
-            put { userService.update() }
-            delete { userService.delete() }
+    authAdmin {
+        get("/authorizedA") { userService.authorized() }
+        route("/user") {
+            post { userService.add() }
+            get { userService.getAll() }
+            route(idParam) {
+                get { userService.getById() }
+                put { userService.update() }
+                delete { userService.delete() }
+            }
         }
-    } }
+    }
 }
 
 private fun Routing.sessionRouting() = authAdmin { route("/session") {

@@ -13,6 +13,7 @@ import com.example.db.models.Users.password
 import com.example.db.models.Users.phone
 import com.example.db.models.Users.role
 import com.example.db.models.Users.selection
+import com.example.db.models.Users.selections
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -23,7 +24,8 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
     override fun resultRowToEntity(row: ResultRow): User = User(
         row[id],       row[name],      row[role],
         row[password], row[firstName], row[lastName],
-        row[phone],    row[address],   row[selection]
+        row[phone],    row[address],   row[selection],
+        row[selections]
     )
 
     override fun setValues(it: UpdateBuilder<Int>, entity: User) {
@@ -36,6 +38,7 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
         it[phone] = entity.phone
         it[address] = entity.address
         it[selection] = entity.selection
+        it[selections] = entity.selections
     }
 
     override suspend fun exactPresents(entity: User): Boolean = dbQuery { !Users.select(
@@ -47,7 +50,8 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
         (lastName eq entity.lastName) and
         (phone eq entity.phone) and
         (address eq entity.address) and
-        (selection eq entity.selection)
+        (selection eq entity.selection) and
+        (selections eq entity.selections)
     ).empty() }
 
     @TestOnly
@@ -64,7 +68,12 @@ object UsersRepo : AbsRepo<User, Users, Int>(Users, id) {
     suspend fun setSelection(id: Int, selection: String?): Boolean =
         updateSingle(Users.id eq id, Users.selection, selection)
 
+    suspend fun setSelections(id: Int, selections: String?): Boolean =
+        updateSingle(Users.id eq id, Users.selections, selections)
+
     suspend fun getSelection(id: Int): String? = getSingle(Users.id eq id, selection)
+
+    suspend fun getSelections(id: Int): String? = getSingle(Users.id eq id, selections)
 
     suspend fun nameExists(name: String): Boolean = getSingle(Users.name eq name, id) != null
 
