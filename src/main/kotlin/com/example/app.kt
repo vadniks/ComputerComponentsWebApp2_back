@@ -13,6 +13,7 @@ import java.util.logging.Logger
 
 val Any.unitStub get() = Unit
 
+@Suppress("ExtractKtorModule")
 fun main() = embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
     configureSecurity()
     configureRouting()

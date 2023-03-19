@@ -77,6 +77,8 @@ private fun Routing.staticRouting() = static {
     resource("/", "/static/index.html")
     static("/") { resources("static") }
     static("/assets") { resources("static/assets") }
+//    static("/res_back") { get("{file}") { call.respondFile(File("/res_back/" + call.parameters["file"])) } }
+    static("/res_back") { files("/res_back") }
 }
 
 private fun Routing.componentRouting() = route("/component") {
@@ -106,7 +108,7 @@ private fun Routing.userRouting() {
         post("/clearSelected") { userService.clearSelected() }
         get("/history") { userService.selectionHistory() }
         post("/history") { userService.logSelection() }
-        delete("/history") { userService.clearHistory() }
+        delete("/history") { userService.clearHistory() } // TODO: add possibility to add and delete component images and store them in separate mutable folder and display images in admin page
         post("/order") { userService.order() }
     }
     authAdmin {
