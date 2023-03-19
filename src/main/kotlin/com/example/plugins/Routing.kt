@@ -43,6 +43,8 @@ private const val idParam = "/{id}"
  * curl 0.0.0.0:8080/component -X POST -H "Content-Type: application/json" -d '{"id":2,"title":"a","type":"MB","description":"b","cost":200,"image":null}' -b cookie.txt
  * curl 0.0.0.0:8080/component/2 -X PUT -H "Content-Type: application/json" -d '{"id":2,"title":"a","type":"MB","description":"b","cost":111,"image":null}' -b cookie.txt
  * curl 0.0.0.0:8080/component/2 -X DELETE -b cookie.txt
+ * curl 0.0.0.0:8080/component/image/a.jpg --data-binary "@/a.jpg" -X POST
+ * curl 0.0.0.0:8080/component/image/a.jpg -X DELETE
  * curl 0.0.0.0:8080/component/type/0
  * curl 0.0.0.0:8080/register -X POST -H "Content-Type: application/json" -d '{"name":"test","password":"pass"}'
  * curl 0.0.0.0:8080/login -X POST -F 'name=user' -F 'password=user' -c cookie.txt
@@ -81,15 +83,19 @@ private fun Routing.staticRouting() = static {
 }
 
 private fun Routing.componentRouting() = route("/component") {
-    authAdmin { post { componentService.add() } }
+    authAdmin {
+        post { componentService.add() }
+        "/image/{file}".let {
+            post(it) { componentService.uploadImage() }
+            delete(it) { componentService.removeImage() }
+        }
+    }
     get { componentService.getAll() }
     route(idParam) {
         get { componentService.getById() }
         authAdmin {
             put { componentService.update() }
             delete { componentService.delete() }
-            post("/upload/{name}") { componentService.uploadImage() }
-            delete("/upload/{name}") { componentService.removeImage() }
         }
     }
     get("/type/{$TYPE}") { componentService.getByType() }
