@@ -77,7 +77,6 @@ private fun Routing.staticRouting() = static {
     resource("/", "/static/index.html")
     static("/") { resources("static") }
     static("/assets") { resources("static/assets") }
-//    static("/res_back") { get("{file}") { call.respondFile(File("/res_back/" + call.parameters["file"])) } }
     static("/res_back") { files("/res_back") }
 }
 
@@ -89,6 +88,8 @@ private fun Routing.componentRouting() = route("/component") {
         authAdmin {
             put { componentService.update() }
             delete { componentService.delete() }
+            post("/upload/{name}") { componentService.uploadImage() }
+            delete("/upload/{name}") { componentService.removeImage() }
         }
     }
     get("/type/{$TYPE}") { componentService.getByType() }

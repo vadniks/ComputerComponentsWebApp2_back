@@ -7,6 +7,9 @@ import com.example.db.repo.ComponentsRepo
 import com.example.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
+import io.ktor.util.cio.*
+import io.ktor.utils.io.*
+import java.io.File
 
 object ComponentService : AbsService() {
     suspend fun add() = call.respondOkIfTrue(ComponentsRepo.addIfNotExists(call.receive()))
@@ -23,4 +26,21 @@ object ComponentService : AbsService() {
 
     private suspend fun getByType(type: Int): List<Component>?
     = type.toType().run { if (this != null) ComponentsRepo.getAll(this) else null }
+
+    private suspend inline fun doIfFileSupplied(crossinline action: suspend (String) -> Unit) = call.parameters["file"].let {
+        if (it == null) {
+            call.respondUserError()
+            return@let
+        }
+        action(it)
+    }
+
+    private fun makeImageFile(name: String) = File("/res_back/$name")
+
+    suspend fun uploadImage() = doIfFileSupplied {
+        call.receiveChannel().copyAndClose(makeImageFile(it).writeChannel())
+        call.respondOk()
+    }
+
+    suspend fun removeImage() = doIfFileSupplied { call.respondOkIfTrue(makeImageFile(it).delete()) }
 }
