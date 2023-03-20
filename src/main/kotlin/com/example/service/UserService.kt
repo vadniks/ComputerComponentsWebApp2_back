@@ -120,6 +120,11 @@ object UserService : AbsService() {
     private fun makeFile(name: String) = File("/res_back/$name")
 
     suspend fun uploadFile() = doIfFileSupplied {
+        if (it.contains(':')) {
+            call.respondUserError()
+            return@doIfFileSupplied
+        }
+
         call.receiveChannel().copyAndClose(makeFile(it).writeChannel())
         call.respondOk()
     }
