@@ -53,8 +53,8 @@ private const val idParam = "/{id}"
  * curl 0.0.0.0:8080/selected -b cookie.txt
  * curl 0.0.0.0:8080/select/1 -X POST -b cookie.txt
  * curl 0.0.0.0:8080/clearSelected -X POST -b cookie.txt
- *
- * curl 0.0.0.0:8080/history -X POST -b cookie.txt TODO <===============================================================
+ * curl 0.0.0.0:8080/history -b cookie.txt
+ * curl 0.0.0.0:8080/history -X DELETE -b cookie.txt
  * curl 0.0.0.0:8080/order -X POST -H "Content-Type: application/json" -d '{"firstName":"fn","lastName":"ln","phone":1234567890,"address":"address"}' -b cookie.txt
  * curl 0.0.0.0:8080/name -b cookie.txt
  * curl 0.0.0.0:8080/user -X POST -H "Content-Type: application/json" -d '{"id":3,"name":"test","role":"USER","password":"test","firstName":null,"lastName":null,"phone":null,"address":null,"selection":null}' -b cookie.txt
@@ -115,8 +115,7 @@ private fun Routing.userRouting() {
         post("/select/$idParam") { userService.select() }
         get("/selected") { userService.selected() }
         post("/clearSelected") { userService.clearSelected() }
-        get("/history") { userService.selectionHistory() }
-        post("/history") { userService.logSelection() } // TODO: track user selections and log them to history store, letting then to display all selections that a particular user has made
+        get("/history") { userService.selectionHistory() } // TODO: track user selections and log them to history store, letting then to display all selections that a particular user has made
         delete("/history") { userService.clearHistory() } // TODO: add possibility to add and delete component images and store them in separate mutable folder and display images in admin page
         post("/order") { userService.order() }
     }

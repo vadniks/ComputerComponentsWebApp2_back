@@ -52,12 +52,8 @@ object UserService : AbsService() {
         call.respondOk()
     }
 
-    suspend fun logSelection() = call.doIfUserIdFound {
-        val user = UsersRepo.getBy(it)
-        if (user == null) { call.respondUserError(); return@doIfUserIdFound }
-
-        call.respondOkIfTrue(UsersRepo.setSelections(it, UsersRepo.getSelections(it) + ':' + call.receive<String>()))
-    }
+    private suspend fun logSelection(userId: Int, selection: String) =
+        UsersRepo.setSelections(userId, "${UsersRepo.getSelections(userId)?.plus(":") ?: ""}$selection")
 
     suspend fun selectionHistory() = call.doIfUserIdFound { call.respondNullable(UsersRepo.getSelections(it)) }
 
@@ -74,12 +70,19 @@ object UserService : AbsService() {
         val user = UsersRepo.getBy(it)
         if (user == null) { call.respondUserError(); return@doIfUserIdFound }
 
-        call.respondOkIfTrue(UsersRepo.update(it, user.copy(
-            firstName = details.firstName,
-            lastName = details.lastName,
-            phone = details.phone,
-            address = details.address
-        )))
+        if (user.selection?.toSelection() == null) {
+            call.respondUserError()
+            return@doIfUserIdFound
+        }
+
+        call.respondOkIfTrue(
+            UsersRepo.update(it, user.copy(
+                firstName = details.firstName,
+                lastName = details.lastName,
+                phone = details.phone,
+                address = details.address
+            )) and logSelection(it, user.selection)
+        )
     }
 
     fun hash(value: String) = hex(MessageDigest.getInstance("SHA-256").digest(value.encodeToByteArray()))

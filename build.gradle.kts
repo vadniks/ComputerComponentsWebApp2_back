@@ -8,9 +8,9 @@ val postgresql_version: String by project
 
 plugins {
     application
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.8.10"
     id("io.ktor.plugin") version "2.2.4"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
 }
 
 group = "com.example"
@@ -21,6 +21,8 @@ application {
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
+
+kotlin.jvmToolchain(11)
 
 repositories { mavenCentral() }
 
