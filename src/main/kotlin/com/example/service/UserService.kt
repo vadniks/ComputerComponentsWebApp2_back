@@ -11,6 +11,9 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
 import io.ktor.util.*
+import io.ktor.util.cio.*
+import io.ktor.utils.io.*
+import java.io.File
 import java.security.MessageDigest
 
 object UserService : AbsService() {
@@ -105,4 +108,29 @@ object UserService : AbsService() {
     suspend fun add() = call.respondOkIfTrue(UsersRepo.addIfNotExists(call.receive()))
     suspend fun update() = call.respondOkIfTrueWithIdParameter { UsersRepo.update(it, call.receive()) }
     suspend fun delete() = call.respondOkIfTrueWithIdParameter { UsersRepo.delete(it) }
+
+    private suspend inline fun doIfFileSupplied(crossinline action: suspend (String) -> Unit) = call.parameters["file"].let {
+        if (it == null) {
+            call.respondUserError()
+            return@let
+        }
+        action(it)
+    }
+
+    private fun makeFile(name: String) = File("/res_back/$name")
+
+    suspend fun uploadFile() = doIfFileSupplied {
+        call.receiveChannel().copyAndClose(makeFile(it).writeChannel())
+        call.respondOk()
+    }
+
+    suspend fun removeFile() = doIfFileSupplied { call.respondOkIfTrue(makeFile(it).delete()) }
+
+    suspend fun getFileNames() {
+        var str = ""
+        File("/res_back").listFiles()?.forEach {
+            str += (if (str.isNotEmpty()) ":" else "") + it.name
+        }
+        call.respondNullable(str.takeIf { str.isNotEmpty() })
+    }
 }

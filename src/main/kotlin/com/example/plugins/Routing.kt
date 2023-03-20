@@ -125,10 +125,10 @@ private fun Routing.userRouting() {
             }
         }
         route("/file") {
-            get { componentService.getFileNames() }
+            get { userService.getFileNames() }
             "/{file}".let {
-                post(it) { componentService.uploadFile() }
-                delete(it) { componentService.removeFile() }
+                post(it) { userService.uploadFile() }
+                delete(it) { userService.removeFile() }
             }
         }
     }
