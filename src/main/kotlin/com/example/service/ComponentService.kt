@@ -37,10 +37,18 @@ object ComponentService : AbsService() {
 
     private fun makeImageFile(name: String) = File("/res_back/$name")
 
-    suspend fun uploadImage() = doIfFileSupplied {
+    suspend fun uploadFile() = doIfFileSupplied {
         call.receiveChannel().copyAndClose(makeImageFile(it).writeChannel())
         call.respondOk()
     }
 
-    suspend fun removeImage() = doIfFileSupplied { call.respondOkIfTrue(makeImageFile(it).delete()) }
+    suspend fun removeFile() = doIfFileSupplied { call.respondOkIfTrue(makeImageFile(it).delete()) }
+
+    suspend fun getFileNames() {
+        var str = ""
+        File("/res_back").listFiles()?.forEach {
+            str += (if (str.isNotEmpty()) ":" else "") + it.name
+        }
+        call.respondNullable(str.takeIf { str.isNotEmpty() })
+    }
 }

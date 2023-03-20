@@ -124,9 +124,12 @@ private fun Routing.userRouting() {
                 delete { userService.delete() }
             }
         }
-        "/file/{file}".let {
-            post(it) { componentService.uploadImage() }
-            delete(it) { componentService.removeImage() }
+        route("/file") {
+            get { componentService.getFileNames() }
+            "/{file}".let {
+                post(it) { componentService.uploadFile() }
+                delete(it) { componentService.removeFile() }
+            }
         }
     }
 }
