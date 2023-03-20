@@ -35,7 +35,7 @@ private typealias Pipeline = PipelineContext<Unit, ApplicationCall>
 private val Pipeline.componentService get() = call.service(ComponentService)
 private val Pipeline.userService get() = call.service(UserService)
 private val Pipeline.sessionService get() = call.service(SessionService)
-private const val idParam = "/{id}"
+@Suppress("ConstPropertyName") private const val idParam = "/{id}"
 
 /**
  * curl 0.0.0.0:8080/component
@@ -87,7 +87,7 @@ private fun Routing.staticRouting() = static {
 private fun Routing.componentRouting() = route("/component") {
     authAdmin {
         post { componentService.add() }
-        "/image/{file}".let {
+        "/file/{file}".let {
             post(it) { componentService.uploadImage() }
             delete(it) { componentService.removeImage() }
         }
@@ -115,7 +115,7 @@ private fun Routing.userRouting() {
         post("/select/$idParam") { userService.select() }
         get("/selected") { userService.selected() }
         post("/clearSelected") { userService.clearSelected() }
-        get("/history") { userService.selectionHistory() } // TODO: track user selections and log them to history store, letting then to display all selections that a particular user has made
+        get("/history") { userService.selectionHistory() }
         delete("/history") { userService.clearHistory() } // TODO: add possibility to add and delete component images and store them in separate mutable folder and display images in admin page
         post("/order") { userService.order() }
     }
