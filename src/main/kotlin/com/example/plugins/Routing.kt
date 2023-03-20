@@ -43,8 +43,6 @@ private val Pipeline.sessionService get() = call.service(SessionService)
  * curl 0.0.0.0:8080/component -X POST -H "Content-Type: application/json" -d '{"id":2,"title":"a","type":"MB","description":"b","cost":200,"image":null}' -b cookie.txt
  * curl 0.0.0.0:8080/component/2 -X PUT -H "Content-Type: application/json" -d '{"id":2,"title":"a","type":"MB","description":"b","cost":111,"image":null}' -b cookie.txt
  * curl 0.0.0.0:8080/component/2 -X DELETE -b cookie.txt
- * curl 0.0.0.0:8080/component/file/a.jpg --data-binary "@a.jpg" -X POST -b cookie.txt
- * curl 0.0.0.0:8080/component/file/a.jpg -X DELETE -b cookie.txt
  * curl 0.0.0.0:8080/component/type/0
  * curl 0.0.0.0:8080/register -X POST -H "Content-Type: application/json" -d '{"name":"test","password":"pass"}'
  * curl 0.0.0.0:8080/login -X POST -F 'name=user' -F 'password=user' -c cookie.txt
@@ -55,6 +53,8 @@ private val Pipeline.sessionService get() = call.service(SessionService)
  * curl 0.0.0.0:8080/clearSelected -X POST -b cookie.txt
  * curl 0.0.0.0:8080/history -b cookie.txt
  * curl 0.0.0.0:8080/history -X DELETE -b cookie.txt
+ * curl 0.0.0.0:8080/file/a.jpg --data-binary "@a.jpg" -X POST -b cookie.txt
+ * curl 0.0.0.0:8080/file/a.jpg -X DELETE -b cookie.txt
  * curl 0.0.0.0:8080/order -X POST -H "Content-Type: application/json" -d '{"firstName":"fn","lastName":"ln","phone":1234567890,"address":"address"}' -b cookie.txt
  * curl 0.0.0.0:8080/name -b cookie.txt
  * curl 0.0.0.0:8080/user -X POST -H "Content-Type: application/json" -d '{"id":3,"name":"test","role":"USER","password":"test","firstName":null,"lastName":null,"phone":null,"address":null,"selection":null}' -b cookie.txt
@@ -85,13 +85,7 @@ private fun Routing.staticRouting() = static {
 }
 
 private fun Routing.componentRouting() = route("/component") {
-    authAdmin {
-        post { componentService.add() }
-        "/file/{file}".let {
-            post(it) { componentService.uploadImage() }
-            delete(it) { componentService.removeImage() }
-        }
-    }
+    authAdmin { post { componentService.add() } }
     get { componentService.getAll() }
     route(idParam) {
         get { componentService.getById() }
@@ -129,6 +123,10 @@ private fun Routing.userRouting() {
                 put { userService.update() }
                 delete { userService.delete() }
             }
+        }
+        "/file/{file}".let {
+            post(it) { componentService.uploadImage() }
+            delete(it) { componentService.removeImage() }
         }
     }
 }
