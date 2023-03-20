@@ -55,6 +55,7 @@ private val Pipeline.sessionService get() = call.service(SessionService)
  * curl 0.0.0.0:8080/history -X DELETE -b cookie.txt
  * curl 0.0.0.0:8080/file/a.jpg --data-binary "@a.jpg" -X POST -b cookie.txt
  * curl 0.0.0.0:8080/file/a.jpg -X DELETE -b cookie.txt
+ * curl 0.0.0.0:8080/file -b cookie.txt
  * curl 0.0.0.0:8080/order -X POST -H "Content-Type: application/json" -d '{"firstName":"fn","lastName":"ln","phone":1234567890,"address":"address"}' -b cookie.txt
  * curl 0.0.0.0:8080/name -b cookie.txt
  * curl 0.0.0.0:8080/user -X POST -H "Content-Type: application/json" -d '{"id":3,"name":"test","role":"USER","password":"test","firstName":null,"lastName":null,"phone":null,"address":null,"selection":null}' -b cookie.txt
